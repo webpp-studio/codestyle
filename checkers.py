@@ -21,6 +21,9 @@ class BaseResult:
     def output(self):
         return ""
 
+    def __bool__(self):
+        return self.is_success()
+
 
 class Result(BaseResult):
     """
@@ -132,7 +135,9 @@ class BaseChecker:
         return Result(path, output, p.returncode)
 
     def fix(self, path):
-        raise NotImplemented("Auto fixing is not supported for this checker")
+        raise NotImplementedError(
+            "Auto fixing is not supported for this checker"
+        )
 
 
 class JSChecker(BaseChecker):
@@ -157,6 +162,14 @@ class JSChecker(BaseChecker):
         resultset.add(self.make_result('jshint', jshint_args, path))
         return resultset
 
+    def fix(self, path):
+        jscs_config_path = get_config_path('.jscsrc')
+        jscs_args = ['--fix']
+        if jscs_config_path is not None:
+            jscs_args.append('--config')
+            jscs_args.append(jscs_config_path)
+        return self.make_result('jscs', jscs_args, path)
+
 
 class PHPChecker(BaseChecker):
     """
@@ -173,6 +186,13 @@ class PHPChecker(BaseChecker):
         resultset.add(self.make_result('phpcs', phpcs_args, path))
         # TODO: PHP Mass Detector
         return resultset
+
+    def fix(self, path):
+        phpcs_config_path = get_config_path('phpcs.xml')
+        if phpcs_config_path is not None:
+            phpcs_args = ['--standard=' + phpcs_config_path]
+        result = self.make_result('phpcbf', phpcs_args, path)
+        return result
 
 
 class PythonChecker(BaseChecker):

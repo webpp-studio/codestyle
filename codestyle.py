@@ -45,6 +45,20 @@ class Application:
                 self.log(" Fail")
                 if self.verbose:
                     self.log_error(result.output)
+                if self.args.fix:
+                    self.log("Trying fix errors...")
+                    try:
+                        result = checker.fix(path)
+                    except NotImplementedError:
+                        self.log_error(
+                            "Auto fixing is not supported for this language"
+                        )
+                    else:
+                        if result:
+                            self.log("Some errors has been fixed")
+                        else:
+                            self.log("No fixable errors found")
+                    self.log("")
         else:
             result = None
         return result
@@ -55,7 +69,7 @@ class Application:
         parser = argparse.ArgumentParser(description='Check and fix code style')
         parser.add_argument('target', metavar='target', type=str, nargs='+',
                             help='files for the checking')
-        parser.add_argument('--fix', dest='fix', action='store_true',
+        parser.add_argument('--try-fix', dest='fix', action='store_true',
                             help='Auto fix codestyle errors', default=False)
         parser.add_argument('--verbose', dest='verbose', action='store_true',
                             help='Show verbose output', default=False)
