@@ -5,7 +5,7 @@ from distutils.core import setup
 
 setup(
     name='codestyle',
-    version='0.0.5',
+    version='0.0.6',
     author=u'Sergey Levitin',
     author_email='selevit@gmail.com',
     packages=['codestyle'],
