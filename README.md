@@ -6,6 +6,14 @@ This script checks and auto fixes codestyle for all supported languages:
 2. Python (pep8 and pylint)
 3. Javascript (jscs and jshint)
 
+## Dependenties
+
+1. phpcs
+2. jshint (global nodejs package)
+3. jscs (global nodejs package)
+4. pep8
+5. pylint
+
 ## Usage
 
 ```
