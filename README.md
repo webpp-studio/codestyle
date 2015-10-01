@@ -28,6 +28,6 @@ positional arguments:
 
 optional arguments:
   -h, --help  show this help message and exit
-  --fix       Auto fix codestyle errors
+  --try-fix       Auto fix codestyle errors
   --verbose   Show verbose output
 ```
