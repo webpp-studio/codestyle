@@ -7,6 +7,14 @@ README.md
 setup.py
 scripts/codestyle
 src/__init__.py
+src/application.py
 src/checkers.py
-src/codestyle.py
 src/utils.py
+src/standards/.csscombrc
+src/standards/.jscsrc
+src/standards/.jshintrc
+src/standards/phpcs.xml
+src/tests/test.css
+src/tests/test.js
+src/tests/test.php
+src/tests/test.py

@@ -76,7 +76,7 @@ class Application:
                             help='files for the checking')
         parser.add_argument('--try-fix', dest='fix', action='store_true',
                             help='Auto fix codestyle errors', default=False)
-        parser.add_argument('--compact', dest='compact', action='store_false',
+        parser.add_argument('--compact', dest='compact', action='store_true',
                             help='Show compact output', default=False)
 
         self.args = parser.parse_args()
