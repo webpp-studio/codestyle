@@ -35,7 +35,7 @@ class Application:
     def log_error(self, string, newline=True):
         self.log(string, newline, sys.stderr)
 
-    def process_file(self, path, verbose=False):
+    def process_file(self, path):
         """Process file to check or keep it"""
 
         file, ext = os.path.splitext(path)
@@ -52,13 +52,13 @@ class Application:
                 if self.args.fix:
                     self.log("Trying fix errors...")
                     try:
-                        result = checker.fix(path)
+                        fix_result = checker.fix(path)
                     except NotImplementedError:
                         self.log_error(
                             "Auto fixing is not supported for this language"
                         )
                     else:
-                        if result:
+                        if fix_result:
                             self.log("Some errors has been fixed")
                         else:
                             self.log("No fixable errors found")
@@ -75,15 +75,12 @@ class Application:
                             help='files for the checking')
         parser.add_argument('--try-fix', dest='fix', action='store_true',
                             help='Auto fix codestyle errors', default=False)
-        parser.add_argument('--verbose', dest='verbose', action='store_true',
-                            help='Show verbose output', default=False)
-        parser.add_argument('--standard', dest='standard', type=str, nargs='?',
-                            help='Name of coding standard directory',
-                            default='default')
+        parser.add_argument('--compact', dest='compact', action='store_false',
+                            help='Show compact output', default=False)
 
         self.args = parser.parse_args()
         self.files = self.args.target
-        self.verbose = self.args.verbose
+        self.verbose = not self.args.compact
 
     def run(self):
         """Run code checking"""
@@ -107,7 +104,7 @@ class Application:
                 )
                 sys.exit(1)
             elif os.path.isfile(filename):
-                result = self.process_file(filename, self.args.verbose)
+                result = self.process_file(filename)
                 if result:
                     if result.is_success():
                         total_ok += 1
@@ -116,14 +113,13 @@ class Application:
             elif os.path.isdir(filename):
                 for root, subdirs, files in os.walk(filename):
                     for subfile in files:
-                        result = self.process_file(os.path.join(root, subfile),
-                                                   self.args.verbose)
+                        result = self.process_file(os.path.join(root, subfile))
                         if result:
                             if result.is_success():
                                 total_ok += 1
                             else:
                                 total_failed += 1
-        self.log( "Total success: %d" % total_ok)
+        self.log("Total success: %d" % total_ok)
         self.log("Total failed: %s" % total_failed)
         if total_failed > 0:
             return False
