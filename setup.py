@@ -11,7 +11,7 @@ setup(
     packages=['codestyle'],
     package_dir={'codestyle': 'src'},
     url='https://github.com/selevit/codestyle',
-    license='GPL licence, see LICENCE.txt',
+    license='GPL licence, see LICENCE',
     description='Extendable codestyle checker and fixer',
     long_description=open('README.md').read(),
     scripts=['scripts/codestyle'],
