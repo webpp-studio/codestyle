@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+"""Code style checker application"""
 
 import os
 import sys

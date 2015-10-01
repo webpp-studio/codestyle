@@ -208,10 +208,9 @@ class PythonChecker(BaseChecker):
 
         # Check for PyLint
         pylintrc = get_config_path('.pylintrc')
+        pylint_args = ['--report=n']
         if pylintrc is not None:
-            pylint_args = ['--rcfile=' + pylintrc]
-        else:
-            pylint_args = []
+            pylint_args += ['--rcfile=' + pylintrc]
         resultset.add(self.make_result('pylint', pylint_args, path))
         return resultset
 
