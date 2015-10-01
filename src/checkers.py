@@ -192,6 +192,8 @@ class PHPChecker(BaseChecker):
         phpcs_config_path = get_config_path('phpcs.xml')
         if phpcs_config_path is not None:
             phpcs_args = ['--standard=' + phpcs_config_path]
+        else:
+            phpcs_args = []
         result = self.make_result('phpcbf', phpcs_args, path)
         return result
 
