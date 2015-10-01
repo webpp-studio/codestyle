@@ -214,3 +214,9 @@ class PythonChecker(BaseChecker):
             pylint_args = []
         resultset.add(self.make_result('pylint', pylint_args, path))
         return resultset
+
+    def fix(self, path):
+        result = self.make_result('autopep8',
+                                  ['--in-space', '--aggresive'],
+                                  path)
+        return result
