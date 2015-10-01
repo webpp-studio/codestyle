@@ -1,12 +1,11 @@
 #!/usr/bin/env python2
-from __future__ import absolute_import
 
 import os
 import subprocess
 from subprocess import PIPE, STDOUT
 from abc import ABCMeta, abstractmethod, abstractproperty
 
-from codestyle.utils import get_config_path
+from utils import get_config_path
 
 
 class BaseResult:

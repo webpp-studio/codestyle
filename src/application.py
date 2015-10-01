@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 
-from __future__ import print_function, absolute_import
-
 import os
 import sys
 import argparse
 
-from codestyle.checkers import *  # NOQA
+from checkers import *  # NOQA
+from utils import check_external_deps, DependencyError
 
 
 class Application:
@@ -19,9 +18,12 @@ class Application:
     }
 
     def __init__(self):
+        self.base_dir = os.path.dirname(__file__)
         self.args = {}
+        self.config = {}
         self.files = []
         self.verbose = False
+        self.config_path = os.path.join(self.base_dir, 'codestyle.conf')
 
     def log(self, string, newline=True, file=sys.stdout):
         if newline:
@@ -83,6 +85,12 @@ class Application:
 
     def run(self):
         """Run code checking"""
+
+        try:
+            check_external_deps()
+        except DependencyError as e:
+            self.log_error(str(e))
+            sys.exit(1)
 
         self.parse_args()
 
