@@ -16,6 +16,7 @@ This script checks and auto fixes codestyle for all supported languages:
 7. pep8
 8. autopep8
 9. pylint
+10. csscomb
 
 ## Usage
 

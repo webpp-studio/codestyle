@@ -220,3 +220,23 @@ class PythonChecker(BaseChecker):
                                   ['--in-space', '--aggresive'],
                                   path)
         return result
+
+
+class LessChecker(BaseChecker):
+    """
+    Less and CSS checker
+    """
+
+    def check_extra(self, path):
+        config_path = get_config_path('.csscombrc')
+        opts = ['--lint', '--verbose']
+        if config_path is not None:
+            opts += ['--config', config_path]
+        return self.make_result('csscomb', opts, path)
+
+    def fix(self, path):
+        config_path = get_config_path('.csscombrc')
+        opts = []
+        if config_path is not None:
+            opts += ['--config', config_path]
+        return self.make_result('csscomb', opts, path)

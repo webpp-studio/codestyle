@@ -15,5 +15,5 @@ setup(
     description='Extendable codestyle checker and fixer',
     long_description=open('README.md').read(),
     scripts=['scripts/codestyle'],
-    install_requires=['pep8', 'pyflakes', 'autopep8']
+    install_requires=['pep8', 'pyflakes', 'autopep8', 'csscomb']
 )

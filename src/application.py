@@ -15,6 +15,8 @@ class Application:
         '.php': PHPChecker(),
         '.py': PythonChecker(),
         '.js': JSChecker(),
+        '.css': LessChecker(),
+        '.less': LessChecker(),
     }
 
     def __init__(self):
