@@ -3,7 +3,7 @@ import os
 BASE_DIR = os.path.dirname(__file__)
 
 CONFIG_DIRS = (
-    os.path.join(BASE_DIR, 'conf'),
+    os.path.join(BASE_DIR, 'standards'),
 )
 
 def get_config_path(relative_path):

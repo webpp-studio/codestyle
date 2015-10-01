@@ -1,9 +1,10 @@
 #!/usr/bin/env python2
-from abc import ABCMeta, abstractmethod, abstractproperty
+import os
 import subprocess
 from subprocess import PIPE, STDOUT
+from abc import ABCMeta, abstractmethod, abstractproperty
+
 from utils import get_config_path
-import os
 
 
 class BaseResult:

@@ -8,78 +8,106 @@ import argparse
 
 from checkers import *  # NOQA
 
-LANGUAGE_MAP = {
-    '.php': PHPChecker(),
-    '.py': PythonChecker(),
-    '.js': JSChecker(),
-}
 
+class Application:
+    """Codestyle checker application"""
 
-def process_file(path, verbose=False):
-    file, ext = os.path.splitext(path)
-    if ext in LANGUAGE_MAP:
-        checker = LANGUAGE_MAP[ext]
-        sys.stdout.write("Checking: " + path + "...")
-        result = checker.check_file(path)
-        if result.is_success():
-            print(" OK")
+    LANGUAGE_MAP = {
+        '.php': PHPChecker(),
+        '.py': PythonChecker(),
+        '.js': JSChecker(),
+    }
+
+    def __init__(self):
+        self.args = {}
+        self.files = []
+        self.verbose = False
+
+    def log(self, string, newline=True, file=sys.stdout):
+        if newline:
+            string += '\n'
+        file.write(string)
+
+    def log_error(self, string, newline=True):
+        self.log(string, newline, sys.stderr)
+
+    def process_file(self, path, verbose=False):
+        """Process file to check or keep it"""
+
+        file, ext = os.path.splitext(path)
+        if ext in self.LANGUAGE_MAP:
+            checker = self.LANGUAGE_MAP[ext]
+            self.log("Checking: " + path + "...", False)
+            result = checker.check_file(path)
+            if result.is_success():
+                self.log(" OK")
+            else:
+                self.log(" Fail")
+                if self.verbose:
+                    self.log_error(result.output)
         else:
-            print(" Fail")
-            if verbose:
-                print(result.output, file=sys.stderr)
-    else:
-        result = None
-    return result
+            result = None
+        return result
 
+    def parse_args(self):
+        """Parse command line argument and save it"""
 
-def main():
-    parser = argparse.ArgumentParser(description='Check and fix code style')
-    parser.add_argument('target', metavar='target', type=str, nargs='+',
-                        help='files for the checking')
-    parser.add_argument('--fix', dest='fix', action='store_true',
-                        help='Auto fix codestyle errors', default=False)
-    parser.add_argument('--verbose', dest='verbose', action='store_true',
-                        help='Show verbose output', default=False)
+        parser = argparse.ArgumentParser(description='Check and fix code style')
+        parser.add_argument('target', metavar='target', type=str, nargs='+',
+                            help='files for the checking')
+        parser.add_argument('--fix', dest='fix', action='store_true',
+                            help='Auto fix codestyle errors', default=False)
+        parser.add_argument('--verbose', dest='verbose', action='store_true',
+                            help='Show verbose output', default=False)
+        parser.add_argument('--standard', dest='standard', type=str, nargs='?',
+                            help='Name of coding standard directory',
+                            default='default')
 
-    args = parser.parse_args()
-    files = args.target
+        self.args = parser.parse_args()
+        self.files = self.args.target
+        self.verbose = self.args.verbose
 
-    total_ok = 0
-    total_failed = 0
+    def run(self):
+        """Run code checking"""
 
-    for filename in files:
-        if not os.path.exists(filename):
-            print(
-                "%s: no such file or directory: %s" %
-                (sys.args[0], filename),
-                file=sys.stderr
-            )
-            sys.exit(1)
+        self.parse_args()
 
-        elif os.path.isfile(filename):
-            result = process_file(filename, args.verbose)
-            if result:
-                if result.is_success():
-                    total_ok += 1
-                else:
-                    total_failed += 1
+        total_ok = 0
+        total_failed = 0
 
-        elif os.path.isdir(filename):
-            for root, subdirs, files in os.walk(filename):
-                for subfile in files:
-                    result = process_file(os.path.join(root, subfile),
-                                          args.verbose)
-                    if result:
-                        if result.is_success():
-                            total_ok += 1
-                        else:
-                            total_failed += 1
+        for filename in self.files:
+            if not os.path.exists(filename):
+                self.log_error(
+                    "%s: no such file or directory: %s" %
+                    (sys.args[0], filename),
+                )
+                sys.exit(1)
+            elif os.path.isfile(filename):
+                result = self.process_file(filename, self.args.verbose)
+                if result:
+                    if result.is_success():
+                        total_ok += 1
+                    else:
+                        total_failed += 1
+            elif os.path.isdir(filename):
+                for root, subdirs, files in os.walk(filename):
+                    for subfile in files:
+                        result = self.process_file(os.path.join(root, subfile),
+                                                   self.args.verbose)
+                        if result:
+                            if result.is_success():
+                                total_ok += 1
+                            else:
+                                total_failed += 1
+        self.log( "Total success: %d" % total_ok)
+        self.log("Total failed: %s" % total_failed)
+        if total_failed > 0:
+            return False
+        return True
 
-    print("Total success: " + str(total_ok))
-    print("Total failed: " + str(total_failed))
-
-    if total_failed > 0:
-        sys.exit(1)
 
 if __name__ == "__main__":
-    main()
+    app = Application()
+    is_success = app.run()
+    if is_success:
+        sys.exit(1)
