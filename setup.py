@@ -5,7 +5,7 @@ from distutils.core import setup
 
 setup(
     name='codestyle',
-    version='0.0.2',
+    version='0.0.3',
     author=u'Sergey Levitin',
     author_email='selevit@gmail.com',
     packages=['codestyle'],
@@ -15,5 +15,5 @@ setup(
     description='Extendable codestyle checker and fixer',
     long_description=open('README.md').read(),
     scripts=['scripts/codestyle'],
-    install_requires=['pep8', 'pyflakes', 'autopep8', 'csscomb']
+    install_requires=['pep8', 'pyflakes', 'autopep8']
 )
