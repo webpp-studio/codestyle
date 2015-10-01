@@ -12,8 +12,6 @@ LANGUAGE_MAP = {
     '.php': PHPChecker(),
     '.py': PythonChecker(),
     '.js': JSChecker(),
-    '.html': HTMLChecker(),
-    '.css': CSSChecker(),
 }
 
 
