@@ -1,2 +1,4 @@
 include README.md AUTHORS CHANGES INSTALL LICENCE
-graft codestyle
+recursive-include src *.py
+graft src/standards
+graft src/tests
