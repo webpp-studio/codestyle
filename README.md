@@ -6,7 +6,7 @@ This script checks and auto fixes codestyle for all supported languages:
 2. Python (pep8 and pylint)
 3. Javascript (jscs and jshint)
 
-## Dependenties
+## Dependencies
 
 1. phpcs
 2. phpcbf
