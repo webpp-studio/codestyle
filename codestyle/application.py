@@ -116,7 +116,7 @@ class Application(object):
         result = checker.check(path)
 
         if self.params.compact:
-            if result:
+            if result.is_success():
                 self.log(" OK")
             else:
                 self.log(" Fail")
@@ -130,7 +130,7 @@ class Application(object):
             try:
                 fix_result = checker.fix(path)
                 if self.params.compact:
-                    if fix_result:
+                    if fix_result.is_success():
                         self.log("Some errors has been fixed\n")
                     else:
                         self.log("Cannot fix errors\n")

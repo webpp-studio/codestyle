@@ -101,15 +101,6 @@ class ResultSet(BaseResult):
         return is_success
 
 
-class DirectoryProcessor(object):
-    """
-    Processor for fast directory check
-    """
-
-    def check(self, dir, checker):
-        pass
-
-
 class BaseChecker(object):
     """
     Base codestyle checker
@@ -158,13 +149,14 @@ class BaseChecker(object):
         if self.application.params.compact:
             kwargs['stdout'] = DEVNULL
         p = subprocess.Popen(command_args, **kwargs)
-        p.communicate()
-        return Result(files, "", p.returncode)
+        output = p.communicate()[0]
+        return Result(files, output, p.returncode)
 
     def check(self, files):
         results = ResultSet()
         for command in self.check_commands:
-            results.add(self.make_result(command, files))
+            result = self.make_result(command, files)
+            results.add(result)
         return results
 
     def fix(self, files):
@@ -222,13 +214,13 @@ class PythonChecker(BaseChecker):
         return (
             (self.exe('pep8'),),
             (self.exe('pylint'), '--report=n',
-                '--rcfile=' + self.cfg('pylint'))
+                '--rcfile=' + self.cfg('pylint')),
         )
 
     @property
     def fix_commands(self):
         return (
-            (self.exe('autopep8'), '--in-place', '---aggresive')
+            (self.exe('autopep8'), '--in-place', '--aggressive'),
         )
 
 
