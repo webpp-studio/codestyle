@@ -5,6 +5,7 @@ This script checks and auto fixes codestyle for all supported languages:
 1. PHP (phpcs)
 2. Python (pep8 and pylint)
 3. Javascript (jscs and jshint)
+4. CSS (csscomb)
 
 ## Dependencies
 
@@ -21,7 +22,7 @@ This script checks and auto fixes codestyle for all supported languages:
 ## Usage
 
 ```
-usage: codestyle.py [-h] [--fix] [--verbose] target [target ...]
+usage: codestyle [-h] [--fix] [--verbose] target [target ...]
 
 Check and fix code style
 
@@ -31,5 +32,5 @@ positional arguments:
 optional arguments:
   -h, --help  show this help message and exit
   --try-fix       Auto fix codestyle errors
-  --verbose   Show verbose output
+  --compact   Show compact output
 ```

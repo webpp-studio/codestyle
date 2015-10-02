@@ -5,10 +5,15 @@ from setuptools import setup, find_packages
 
 setup(
     name='codestyle',
-    version='0.0.7',
+    version='0.0.8',
     author=u'Sergey Levitin',
     author_email='selevit@gmail.com',
     packages=find_packages(),
+    package_data={
+        'codestyle': ['standards/*'],
+    },
+    include_package_data=True,
+    zip_safe=False,
     url='https://github.com/selevit/codestyle',
     license='GPL licence, see LICENCE',
     description='Extendable codestyle checker and fixer',
