@@ -58,7 +58,7 @@ class Application(object):
                             help='Auto fix codestyle errors', default=False)
         parser.add_argument('-c', '--compact', dest='compact',
                             action='store_true', help='Show compact output',
-                             default=False)
+                            default=False)
         parser.add_argument('-s', '--standard', dest='standard', type=str,
                             help='Path to the coding standard directory',
                             default=self.settings.DEFAULT_STANDARD_DIR,
