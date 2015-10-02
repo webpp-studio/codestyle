@@ -2,9 +2,8 @@
 
 import sys
 
-from codestyle import Application
+from codestyle import Application, settings
 
-app = Application()
-is_success = app.run()
-if not is_success:
+app = Application(settings)
+if app.run() is False:
     sys.exit(1)

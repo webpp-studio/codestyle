@@ -9,7 +9,7 @@ from abc import ABCMeta, abstractmethod, abstractproperty
 DEVNULL = open(os.devnull, 'wb')
 
 
-class BaseResult:
+class BaseResult(object):
     """
     Base checking result
     """
