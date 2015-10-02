@@ -9,7 +9,7 @@ from checkers import *  # NOQA
 from utils import check_external_deps, DependencyError
 
 
-class Application:
+class Application(object):
     """Codestyle checker application"""
 
     LANGUAGE_MAP = {
@@ -22,11 +22,8 @@ class Application:
 
     def __init__(self):
         self.base_dir = os.path.dirname(__file__)
-        self.args = {}
-        self.config = {}
         self.files = []
         self.verbose = False
-        self.config_path = os.path.join(self.base_dir, 'codestyle.conf')
 
     def log(self, string, newline=True, file=sys.stdout):
         if newline:

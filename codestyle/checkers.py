@@ -8,7 +8,7 @@ from abc import ABCMeta, abstractmethod, abstractproperty
 from utils import get_config_path
 
 
-class BaseResult:
+class BaseResult(object):
     """
     Base checking result
     """

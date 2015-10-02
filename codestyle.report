@@ -1,0 +1,82 @@
+
+No config file found, using default configuration
+************* Module codestyle.checkers
+W:188, 0: TODO: PHP Mass Detector (fixme)
+C:  1, 0: Missing module docstring (missing-docstring)
+W:  8, 0: Relative import 'utils', should be 'codestyle.utils' (relative-import)
+C: 11, 0: Old-style class defined. (old-style-class)
+W: 11, 0: Class has no __init__ method (no-init)
+C: 18, 4: Missing method docstring (missing-docstring)
+C: 22, 4: Missing method docstring (missing-docstring)
+C: 49, 4: Missing method docstring (missing-docstring)
+C: 59, 4: Missing method docstring (missing-docstring)
+C: 72, 4: Missing method docstring (missing-docstring)
+C: 75, 4: Missing method docstring (missing-docstring)
+C: 79, 4: Missing method docstring (missing-docstring)
+C:103, 0: Old-style class defined. (old-style-class)
+W:103, 0: Class has no __init__ method (no-init)
+C:110, 4: Missing method docstring (missing-docstring)
+R:110, 4: Method could be a function (no-self-use)
+C:114, 4: Missing method docstring (missing-docstring)
+R:114, 4: Method could be a function (no-self-use)
+C:117, 4: Missing method docstring (missing-docstring)
+C:131, 4: Missing method docstring (missing-docstring)
+C:133, 8: Invalid variable name "p" (invalid-name)
+R:131, 4: Method could be a function (no-self-use)
+C:138, 4: Missing method docstring (missing-docstring)
+W:144, 0: Class has no __init__ method (no-init)
+C:149, 4: Missing method docstring (missing-docstring)
+W:175, 0: Class has no __init__ method (no-init)
+C:180, 4: Missing method docstring (missing-docstring)
+W:201, 0: Class has no __init__ method (no-init)
+C:206, 4: Missing method docstring (missing-docstring)
+W:226, 0: Class has no __init__ method (no-init)
+C:231, 4: Missing method docstring (missing-docstring)
+W:  3, 0: Unused import os (unused-import)
+
+
+No config file found, using default configuration
+************* Module codestyle
+C:  1, 0: Missing module docstring (missing-docstring)
+W:  1, 0: Relative import 'application', should be 'codestyle.application' (relative-import)
+
+codestyle/application.py:74:80: E501 line too long (80 > 79 characters)
+No config file found, using default configuration
+************* Module codestyle.application
+W:  8, 0: Relative import 'checkers', should be 'codestyle.checkers' (relative-import)
+W:  8, 0: Wildcard import checkers (wildcard-import)
+W:  9, 0: Relative import 'utils', should be 'codestyle.utils' (relative-import)
+C: 12, 0: Old-style class defined. (old-style-class)
+W: 31,40: Redefining built-in 'file' (redefined-builtin)
+C: 31, 4: Missing method docstring (missing-docstring)
+R: 31, 4: Method could be a function (no-self-use)
+C: 36, 4: Missing method docstring (missing-docstring)
+W: 42, 8: Redefining built-in 'file' (redefined-builtin)
+E: 53,19: Instance of 'dict' has no 'fix' member (but some types could not be inferred) (maybe-no-member)
+W: 42, 8: Unused variable 'file' (unused-variable)
+E: 83,21: Instance of 'dict' has no 'target' member (but some types could not be inferred) (maybe-no-member)
+E: 84,27: Instance of 'dict' has no 'compact' member (but some types could not be inferred) (maybe-no-member)
+C: 91,34: Invalid variable name "e" (invalid-name)
+E:104,21: Module 'sys' has no 'args' member (no-member)
+W:115,26: Unused variable 'subdirs' (unused-variable)
+R: 86, 4: Too many branches (14/12) (too-many-branches)
+C:131, 4: Invalid constant name "app" (invalid-name)
+C:132, 4: Invalid constant name "is_success" (invalid-name)
+W:  8, 0: Unused import BaseResult from wildcard import (unused-wildcard-import)
+W:  8, 0: Unused import STDOUT from wildcard import (unused-wildcard-import)
+W:  8, 0: Unused import ResultSet from wildcard import (unused-wildcard-import)
+W:  8, 0: Unused import subprocess from wildcard import (unused-wildcard-import)
+W:  8, 0: Unused import get_config_path from wildcard import (unused-wildcard-import)
+W:  8, 0: Unused import PIPE from wildcard import (unused-wildcard-import)
+W:  8, 0: Unused import abstractmethod from wildcard import (unused-wildcard-import)
+W:  8, 0: Unused import ABCMeta from wildcard import (unused-wildcard-import)
+W:  8, 0: Unused import abstractproperty from wildcard import (unused-wildcard-import)
+W:  8, 0: Unused import Result from wildcard import (unused-wildcard-import)
+W:  8, 0: Unused import BaseChecker from wildcard import (unused-wildcard-import)
+
+Checking: codestyle/checkers.py... Fail
+Checking: codestyle/__init__.py... Fail
+Checking: codestyle/utils.py... OK
+Checking: codestyle/application.py... Fail
+Total success: 1
+Total failed: 3
