@@ -28,21 +28,14 @@ CHECKER_EXE = {
 
 # Config names for checkers
 CHECKER_CFG = {
-    'jshint': _parser.get('checker_cfg_name', 'jshint', '.jshintrc'),
-    'jscs': _parser.get('checker_cfg_name', 'jscs', '.jscsrc'),
-    'csscomb': _parser.get('checker_cfg_name', 'csscomb', '.csscombrc'),
+    'jshint': _parser.get('checker_cfg_name', 'jshint', 'jshint.json'),
+    'jscs': _parser.get('checker_cfg_name', 'jscs', 'jscs.json'),
+    'csscomb': _parser.get('checker_cfg_name', 'csscomb', 'csscomb.json'),
     'phpcs': _parser.get('checker_cfg_name', 'phpcs', 'phpcs.xml'),
-    'pylint': _parser.get('checker_cfg_name', 'pylint', '.pylintrc'),
+    'pylint': _parser.get('checker_cfg_name', 'pylint', 'pylintrc'),
 }
 
 # Default coding standard directory (with checker config files)
 DEFAULT_STANDARD_DIR = _parser.get('path', 'default_standard_dir', '')
 if not DEFAULT_STANDARD_DIR:
     DEFAULT_STANDARD_DIR = os.path.join(BASE_DIR, 'standards')
-
-CHECKERS = (
-    ('.php', 'codestyle.checkers.PHPChecker'),
-    ('.js', 'codestyle.checkers.JSChecker'),
-    ('.py', 'codestyle.checkers.PythonChecker'),
-    (('.css', '.less'), 'codestyle.checkers.LessChecker')
-)

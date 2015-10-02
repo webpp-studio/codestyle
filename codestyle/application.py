@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 """Code style checker application"""
 
+from __future__ import absolute_import
 import os
 import sys
 import argparse
 
-from checkers import BaseChecker
+import checkers
 from utils import check_external_deps, DependencyError, import_class
 import settings
 
@@ -15,6 +16,13 @@ class Application(object):
     Codestyle checker application
     """
 
+    CHECKERS = (
+        ('.php', checkers.PHPChecker),
+        ('.js', checkers.JSChecker),
+        ('.py', checkers.PythonChecker),
+        (('.css', '.less'), checkers.LessChecker)
+    )
+
     def __init__(self, settings):
         self.settings = settings
         self.params = None
@@ -22,9 +30,8 @@ class Application(object):
 
     def create_checkers(self):
         self.checkers = {}
-        for ext, checker_class_name in self.settings.CHECKERS:
-            checker_class = import_class(checker_class_name)
-            if not issubclass(checker_class, BaseChecker):
+        for ext, checker_class in self.CHECKERS:
+            if not issubclass(checker_class, checkers.BaseChecker):
                 raise TypeError('expected BaseChecker subclass')
             checker_instance = checker_class(application=self)
             if isinstance(ext, (list, tuple)):
@@ -106,7 +113,7 @@ class Application(object):
         if self.params.compact:
             self.log("Checking: " + path + "...", False)
 
-        result = checker.check_file(path)
+        result = checker.check(path)
 
         if self.params.compact:
             if result:
