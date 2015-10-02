@@ -1,4 +1,3 @@
-include README.md AUTHORS CHANGES INSTALL LICENCE
-recursive-include src *.py
-graft src/standards
-graft src/tests
+include README.md AUTHORS LICENCE
+recursive-include codestyle *
+recursive-include codestyle/standards *
