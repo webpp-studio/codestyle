@@ -41,8 +41,8 @@ if not DEFAULT_STANDARD_DIR:
     DEFAULT_STANDARD_DIR = os.path.join(BASE_DIR, 'standards')
 
 CHECKERS = (
-    ('.php', 'checkers.PHPChecker'),
-    ('.js', 'checkers.JSChecker'),
-    ('.py', 'checkers.PythonChecker'),
-    (('.css', '.less'), 'checkers.LessChecker')
+    ('.php', 'codestyle.checkers.PHPChecker'),
+    ('.js', 'codestyle.checkers.JSChecker'),
+    ('.py', 'codestyle.checkers.PythonChecker'),
+    (('.css', '.less'), 'codestyle.checkers.LessChecker')
 )
