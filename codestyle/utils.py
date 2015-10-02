@@ -4,12 +4,6 @@ import os
 import subprocess
 from subprocess import PIPE
 
-BASE_DIR = os.path.dirname(__file__)
-
-CONFIG_DIRS = (
-    os.path.join(BASE_DIR, 'standards'),
-)
-
 
 class DependencyError(BaseException):
     """
@@ -17,19 +11,6 @@ class DependencyError(BaseException):
     """
 
     pass
-
-
-def get_config_path(relative_path):
-    """
-    Get path of the config file by name
-    """
-
-    path = None
-    for dir_ in CONFIG_DIRS:
-        abspath = os.path.join(dir_, relative_path)
-        if os.path.exists(abspath):
-            path = abspath
-    return path
 
 
 def which(program):
@@ -69,3 +50,11 @@ def check_external_deps():
     proc.communicate()
     if proc.returncode != 0:
         raise DependencyError('jscs-fixer is not installed')
+
+
+def import_class(name):
+    components = name.split('.')
+    mod = __import__(components[0])
+    for comp in components[1:]:
+        mod = getattr(mod, comp)
+    return mod

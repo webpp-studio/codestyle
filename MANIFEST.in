@@ -1,3 +1,3 @@
 include README.md AUTHORS LICENCE
-recursive-include codestyle *
+recursive-include codestyle *.py *.cfg
 recursive-include codestyle/standards *

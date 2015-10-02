@@ -5,7 +5,8 @@ import subprocess
 from subprocess import PIPE, STDOUT
 from abc import ABCMeta, abstractmethod, abstractproperty
 
-from utils import get_config_path
+
+DEVNULL = open(os.devnull, 'wb')
 
 
 class BaseResult:
@@ -114,6 +115,17 @@ class BaseChecker:
     def args(self):
         return []
 
+    @property
+    def settings(self):
+        return self.application.settings
+
+    def __init__(self, application, **kwargs):
+        self.application = application
+        self.extra = kwargs
+
+    def get_config_path(self, name):
+        return self.application.get_config_path(name)
+
     def check_file(self, path):
         check_extra = getattr(self, "check_extra", None)
         if callable(check_extra):
@@ -130,8 +142,10 @@ class BaseChecker:
 
     def make_result(self, cmd, args, path):
         popen_args = [cmd] + args + [path]
-        p = subprocess.Popen(popen_args, stderr=STDOUT, stdin=PIPE,
-                             stdout=PIPE)
+        kwargs = {'stderr': STDOUT}
+        if self.application.params.compact:
+            kwargs['stdout'] = DEVNULL
+        p = subprocess.Popen(popen_args, **kwargs)
         output = p.communicate()[0]
         return Result(path, output, p.returncode)
 
@@ -148,28 +162,28 @@ class JSChecker(BaseChecker):
 
     def check_extra(self, path):
         # Check for JSCS
-        jscs_config_path = get_config_path('.jscsrc')
+        jscs_config_path = self.get_config_path(self.settings.CHECKER_CFG['jscs'])
         jscs_args = []
         if jscs_config_path is not None:
             jscs_args = ['--config', jscs_config_path]
         resultset = ResultSet()
-        resultset.add(self.make_result('jscs', jscs_args, path))
+        resultset.add(self.make_result(self.settings.CHECKER_EXE['jscs'], jscs_args, path))
 
         # Check for JSHint
-        jshint_config_path = get_config_path('.jshintrc')
+        jshint_config_path = self.get_config_path(self.settings.CHECKER_CFG['jshint'])
         jshint_args = []
         if jshint_config_path is not None:
             jshint_args = ['--config', jshint_config_path]
-        resultset.add(self.make_result('jshint', jshint_args, path))
+        resultset.add(self.make_result(self.settings.CHECKER_EXE['jshint'], jshint_args, path))
         return resultset
 
     def fix(self, path):
-        jscs_config_path = get_config_path('.jscsrc')
+        jscs_config_path = self.get_config_path(self.settings.CHECKER_CFG['jscs'])
         jscs_args = ['--fix']
         if jscs_config_path is not None:
             jscs_args.append('--config')
             jscs_args.append(jscs_config_path)
-        return self.make_result('jscs', jscs_args, path)
+        return self.make_result(self.settings.CHECKER_EXE['jscs'], jscs_args, path)
 
 
 class PHPChecker(BaseChecker):
@@ -179,22 +193,21 @@ class PHPChecker(BaseChecker):
 
     def check_extra(self, path):
         # Check for PHPCS
-        phpcs_config_path = get_config_path('phpcs.xml')
+        phpcs_config_path = self.get_config_path(self.settings.CHECKER_CFG['phpcs'])
         phpcs_args = []
         if phpcs_config_path is not None:
             phpcs_args = ['--standard=' + phpcs_config_path]
         resultset = ResultSet()
-        resultset.add(self.make_result('phpcs', phpcs_args, path))
+        resultset.add(self.make_result(self.settings.CHECKER_EXE['phpcs'], phpcs_args, path))
         # TODO: PHP Mass Detector
         return resultset
 
     def fix(self, path):
-        phpcs_config_path = get_config_path('phpcs.xml')
+        phpcs_config_path = self.get_config_path(self.settings.CHECKER_CFG['phpcs'])
         if phpcs_config_path is not None:
             phpcs_args = ['--standard=' + phpcs_config_path]
-        else:
-            phpcs_args = []
-        result = self.make_result('phpcbf', phpcs_args, path)
+        else: phpcs_args = []
+        result = self.make_result(self.settings.CHECKER_EXE['phpcbf'], phpcs_args, path)
         return result
 
 
@@ -206,19 +219,19 @@ class PythonChecker(BaseChecker):
     def check_extra(self, path):
         # Check for PEP 8
         resultset = ResultSet()
-        resultset.add(self.make_result('pep8', [], path))
+        resultset.add(self.make_result(self.settings.CHECKER_EXE['pep8'], [], path))
 
         # Check for PyLint
-        pylintrc = get_config_path('.pylintrc')
+        pylintrc = self.get_config_path(self.settings.CHECKER_CFG['pylint'])
         pylint_args = ['--report=n']
         if pylintrc is not None:
             pylint_args += ['--rcfile=' + pylintrc]
-        resultset.add(self.make_result('pylint', pylint_args, path))
+        resultset.add(self.make_result(self.settings.CHECKER_EXE['pylint'], pylint_args, path))
         return resultset
 
     def fix(self, path):
-        result = self.make_result('autopep8',
-                                  ['--in-space', '--aggresive'],
+        result = self.make_result(self.settings.CHECKER_EXE['autopep8'],
+                                  ['--in-place', '--aggressive'],
                                   path)
         return result
 
@@ -229,15 +242,15 @@ class LessChecker(BaseChecker):
     """
 
     def check_extra(self, path):
-        config_path = get_config_path('.csscombrc')
+        config_path = self.get_config_path(self.settings.CHECKER_CFG['csscomb'])
         opts = ['--lint', '--verbose']
         if config_path is not None:
             opts += ['--config', config_path]
-        return self.make_result('csscomb', opts, path)
+        return self.make_result(self.settings.CHECKER_EXE['csscomb'], opts, path)
 
     def fix(self, path):
-        config_path = get_config_path('.csscombrc')
+        config_path = self.get_config_path(self.settings.CHECKER_CFG['csscomb'])
         opts = []
         if config_path is not None:
             opts += ['--config', config_path]
-        return self.make_result('csscomb', opts, path)
+        return self.make_result(self.settings.CHECKER_EXE['csscomb'], opts, path)
