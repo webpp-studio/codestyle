@@ -2,8 +2,8 @@
 
 import os
 import subprocess
-from subprocess import PIPE, STDOUT
-from abc import ABCMeta, abstractmethod, abstractproperty
+from subprocess import STDOUT
+from abc import ABCMeta, abstractmethod
 
 from result import Result, ResultSet
 
@@ -133,7 +133,7 @@ class PythonChecker(BaseChecker):
         return (
             (self.exe('pep8'),),
             (self.exe('pylint'), '--report=n',
-                '--rcfile=' + self.cfg('pylint')),
+             '--rcfile=' + self.cfg('pylint')),
         )
 
     def get_fix_commands(self):
@@ -150,13 +150,13 @@ class LessChecker(BaseChecker):
     def get_check_commands(self):
         return (
             (self.exe('csscomb'), '--lint', '--verbose',
-                '--config', self.cfg('csscomb')),
+             '--config', self.cfg('csscomb')),
         )
 
     def get_fix_commands(self):
         return (
             (self.exe('csscomb'), '--lint', '--verbose',
-                '--config', self.cfg('csscomb')),
+             '--config', self.cfg('csscomb')),
         )
 
 

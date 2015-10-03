@@ -1,3 +1,7 @@
+"""
+Checking result classes
+"""
+
 from abc import ABCMeta, abstractmethod, abstractproperty
 
 

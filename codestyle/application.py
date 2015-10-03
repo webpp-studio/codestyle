@@ -1,5 +1,7 @@
 #!/usr/bin/env python
-"""Code style checker application"""
+"""
+Code style checker application
+"""
 
 import os
 import sys
@@ -12,7 +14,7 @@ import settings
 
 class Application(object):
     """
-    Codestyle checker application
+    Codestyle checker application class
     """
 
     # Checker classmap
@@ -24,7 +26,7 @@ class Application(object):
         ('.html', checkers.HTMLChecker),
     )
 
-    def __init__(self, settings):
+    def __init__(self):
         self.settings = settings
         self.params = None
         self.checkers = None
@@ -59,10 +61,10 @@ class Application(object):
         Get checker instance by extension
         """
 
-        checkers = self.get_checkers()
+        checkers_ = self.get_checkers()
         if self.params.language is not None:  # forced language
-            return checkers.get('.%s' % self.params.language, None)
-        return self.get_checkers().get(ext, None)
+            return checkers_.get('.%s' % self.params.language, None)
+        return checkers_.get(ext, None)
 
     def get_config_path(self, filename):
         """
@@ -109,7 +111,7 @@ class Application(object):
             return
         checker_map = self.get_checkers()
         ext = '.' + language.lower()
-        if not ext in checker_map:
+        if ext not in checker_map:
             self.exit_with_error(
                 "Unsupported language: %s\n"
                 "Supported extensions: %s" % (
@@ -125,14 +127,14 @@ class Application(object):
 
         return self.params.standard
 
-    def log(self, string, newline=True, file=sys.stdout):
+    def log(self, string, newline=True, buf=sys.stdout):
         """
         Log message to STDOUT
         """
 
         if newline:
             string += '\n'
-        file.write(string)
+        buf.write(string)
 
     def log_error(self, string, newline=True):
         """
@@ -160,6 +162,8 @@ class Application(object):
 
         if self.params.compact:
             self.log("Processing: " + path + "...", False)
+        else:
+            self.log("Processing: " + path + "...")
 
         result = None
         if not self.params.fix_only:
@@ -197,7 +201,7 @@ class Application(object):
         Check code in directory (recursive)
         """
 
-        for root, subdirs, files in os.walk(path):
+        for root, _, files in os.walk(path):
             for subfile in files:
                 yield self.process_file(os.path.join(root, subfile))
 
@@ -226,8 +230,8 @@ class Application(object):
 
         try:
             check_external_deps()
-        except DependencyError as e:
-            self.log_error(str(e))
+        except DependencyError as ex:
+            self.log_error(str(ex))
             sys.exit(1)
 
         total_success = 0
@@ -245,11 +249,9 @@ class Application(object):
         self.log("Total failed: %s" % total_failed)
 
         if total_failed > 0:
-            return False
-        return True
+            sys.exit(1)
+        sys.exit()
 
 
 if __name__ == "__main__":
-    app = Application(settings)
-    if app.run() is False:
-        sys.exit(1)
+    Application().run()
