@@ -20,7 +20,7 @@ Installation
 
     # Install codestyle and dependencies
     pip install codestyle
-    npm install -g jshint jscs-fixer csscomb htmlcs
+    npm install -g jshint jscs-fixer csscomb htmlcs brace-expansion
     pear install PHP_CodeSniffer
 
 Usage
