@@ -1,6 +1,5 @@
 import os
 from ConfigParser import ConfigParser
-import checkers
 
 # Base project root
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))

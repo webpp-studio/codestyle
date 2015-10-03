@@ -15,6 +15,7 @@ class Application(object):
     Codestyle checker application
     """
 
+    # Checker classmap
     CHECKERS = (
         ('.php', checkers.PHPChecker),
         ('.js', checkers.JSChecker),
@@ -222,6 +223,7 @@ class Application(object):
         self.check_force_language(self.params.language)
 
         self.log("Checking external dependencies....")
+
         try:
             check_external_deps()
         except DependencyError as e:

@@ -5,14 +5,23 @@ class BaseResult:
     """
     Base checking result
     """
+
     __metaclass__ = ABCMeta
 
     @abstractmethod
     def is_success(self):
+        """
+        Check result is success
+        """
+
         return False
 
     @abstractproperty
     def output(self):
+        """
+        Get result output (stdout and stderr)
+        """
+
         return ""
 
     def __bool__(self):
@@ -36,6 +45,10 @@ class Result(BaseResult):
         self._is_success = True if self.status == 0 else False
 
     def is_success(self):
+        """
+        Check result is success
+        """
+
         return self._is_success
 
 
@@ -48,10 +61,18 @@ class ResultSet(BaseResult):
         self.results = []
 
     def add(self, result):
+        """
+        Add checking result
+        """
+
         self.results.append(result)
 
     @property
     def output(self):
+        """
+        Get output of all checking results
+        """
+
         output = ""
         for result in self.results:
             output += result.output
@@ -60,6 +81,10 @@ class ResultSet(BaseResult):
         return output
 
     def is_success(self):
+        """
+        Check for all checking results are success
+        """
+
         if len(self.results) == 0:
             return False
         is_success = True
