@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='codestyle',
-    version='0.0.18',
+    version='0.0.19',
     author=u'Sergey Levitin',
     author_email='selevit@gmail.com',
     packages=find_packages(),
@@ -19,5 +19,6 @@ setup(
     description='Extendable codestyle checker and fixer',
     long_description=open('README.rst').read(),
     scripts=['scripts/codestyle'],
-    install_requires=['pep8', 'autopep8', 'pylint']
+    install_requires=['pep8', 'autopep8', 'pylint'],
+    test_suite='tests'
 )
