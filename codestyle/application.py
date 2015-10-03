@@ -80,7 +80,13 @@ class Application(object):
         parser.add_argument('target', metavar='target', type=str, nargs='+',
                             help='files for checking')
         parser.add_argument('-i', '--try-fix', dest='fix', action='store_true',
-                            help='puto fix codestyle errors', default=False)
+                            help='auto fix codestyle errors', default=False)
+        parser.add_argument(
+            '-ff', '--fix-only',
+            dest='fix_only', action='store_true',
+            help='fix possible errors without extra checking',
+            default=False
+        )
         parser.add_argument('-c', '--compact', dest='compact',
                             action='store_true', help='Show compact output',
                             default=False)
@@ -152,22 +158,23 @@ class Application(object):
             return None
 
         if self.params.compact:
-            self.log("Checking: " + path + "...", False)
+            self.log("Processing: " + path + "...", False)
 
-        result = checker.check(path)
-
-        if self.params.compact:
-            if result.is_success():
-                self.log(" OK")
-            else:
-                self.log(" Fail")
-        else:
-            if result.output:
-                self.log("\n")
-
-        if self.params.fix:
+        result = None
+        if not self.params.fix_only:
+            result = checker.check(path)
             if self.params.compact:
-                self.log("Trying fix errors...")
+                if result.is_success():
+                    self.log(" OK")
+                else:
+                    self.log(" Fail")
+            else:
+                if result.output:
+                    self.log("\n")
+        else:
+            self.log("")
+
+        if self.params.fix or self.params.fix_only:
             try:
                 fix_result = checker.fix(path)
                 if self.params.compact:
@@ -175,6 +182,8 @@ class Application(object):
                         self.log("Some errors has been fixed\n")
                     else:
                         self.log("Cannot fix errors\n")
+                if self.params.fix_only:
+                    result = fix_result
             except NotImplementedError:
                 self.log_error(
                     "Auto fixing is not supported for this language\n"
