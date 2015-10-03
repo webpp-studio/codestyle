@@ -24,6 +24,7 @@ CHECKER_EXE = {
     'autopep8': _parser.get('exe', 'autopep8', 'autopep8'),
     'phpcs': _parser.get('exe', 'phpcs', 'phpcs'),
     'phpcbf': _parser.get('exe', 'phpcbf', 'phpcbf'),
+    'htmlcs': _parser.get('exe', 'htmlcs', 'htmlcs'),
 }
 
 # Config names for checkers
@@ -33,6 +34,7 @@ CHECKER_CFG = {
     'csscomb': _parser.get('checker_cfg_name', 'csscomb', 'csscomb.json'),
     'phpcs': _parser.get('checker_cfg_name', 'phpcs', 'phpcs.xml'),
     'pylint': _parser.get('checker_cfg_name', 'pylint', 'pylintrc'),
+    'htmlcs': _parser.get('checker_cfg_name', 'htmlcs', 'htmlcs.json'),
 }
 
 # Default coding standard directory (with checker config files)

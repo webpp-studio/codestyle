@@ -20,7 +20,8 @@ class Application(object):
         ('.php', checkers.PHPChecker),
         ('.js', checkers.JSChecker),
         ('.py', checkers.PythonChecker),
-        (('.css', '.less'), checkers.LessChecker)
+        (('.css', '.less'), checkers.LessChecker),
+        ('.html', checkers.HTMLChecker),
     )
 
     def __init__(self, settings):
@@ -44,14 +45,24 @@ class Application(object):
             else:
                 self.checkers[ext] = checker_instance
 
+    def get_checkers(self):
+        """
+        Get all checker instances for extensions
+        """
+
+        if self.checkers is None:
+            self.create_checkers()
+        return self.checkers
+
     def get_checker(self, ext):
         """
         Get checker instance by extension
         """
 
-        if self.checkers is None:
-            self.create_checkers()
-        return self.checkers.get(ext, None)
+        checkers = self.get_checkers()
+        if self.params.language is not None:  # forced language
+            return checkers.get('.%s' % self.params.language, None)
+        return self.get_checkers().get(ext, None)
 
     def get_config_path(self, filename):
         """
@@ -70,15 +81,36 @@ class Application(object):
         parser.add_argument('target', metavar='target', type=str, nargs='+',
                             help='files for checking')
         parser.add_argument('-i', '--try-fix', dest='fix', action='store_true',
-                            help='Auto fix codestyle errors', default=False)
+                            help='puto fix codestyle errors', default=False)
         parser.add_argument('-c', '--compact', dest='compact',
                             action='store_true', help='Show compact output',
                             default=False)
         parser.add_argument('-s', '--standard', dest='standard', type=str,
-                            help='Path to the coding standard directory',
+                            help='path to the coding standard directory',
                             default=self.settings.DEFAULT_STANDARD_DIR,
                             metavar='standard-dir')
+        parser.add_argument('-l', '--language', dest='language', type=str,
+                            help='force set language for check',
+                            metavar='language name', default=None)
         return parser.parse_args()
+
+    def check_force_language(self, language):
+        """
+        Check for selected language
+        """
+
+        if language is None:
+            return
+        checker_map = self.get_checkers()
+        ext = '.' + language.lower()
+        if not ext in checker_map:
+            self.exit_with_error(
+                "Unsupported language: %s\n"
+                "Supported extensions: %s" % (
+                    language,
+                    ', '.join([k for k in checker_map.keys()])
+                )
+            )
 
     def get_standard_dir(self):
         """
@@ -179,6 +211,7 @@ class Application(object):
         """
 
         self.params = self.parse_cmd_args()
+        self.check_force_language(self.params.language)
 
         self.log("Checking external dependencies....")
         try:

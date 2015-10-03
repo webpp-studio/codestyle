@@ -7,6 +7,7 @@ This script checks and auto fixes codestyle for all supported languages:
 2. Python (pep8 and pylint)
 3. Javascript (jscs and jshint)
 4. CSS (csscomb)
+4. HTML (htmlcs) - without in place fix support
 
 Installation
 ------------
@@ -53,10 +54,10 @@ Example
     codestyle test.js test.php test.py
 
     # check file and try to fix errors
-    codestyle --try-fix test.js
+    codestyle -i test.js
 
     # check project with compact output (no detail errors information)
-    codestyle --compact /path/to/project/dir
+    codestyle -c /path/to/project/dir
 
     # check all project and save full report to file
     codestyle /path/to/project &> report.txt
@@ -73,4 +74,6 @@ Dependencies
 7. autopep8
 8. pylint
 9. csscomb
+10. htmlcs
+
 
