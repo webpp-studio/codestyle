@@ -29,10 +29,10 @@ class Result(BaseResult):
     output = ""
     _is_success = False
 
-    def __init__(self, target=None, output="", status=None):
+    def __init__(self, target=None, status=None, output=""):
         self.target = target
-        self.output = str(output) if output is not None else ""
         self.status = int(status)
+        self.output = str(output) if output is not None else ""
         self._is_success = True if self.status == 0 else False
 
     def is_success(self):
@@ -44,19 +44,11 @@ class ResultSet(BaseResult):
     Set of code checking results
     """
 
-    _is_success = False
-
     def __init__(self):
-        self._results = []
-
-    @property
-    def results(self):
-        return self._results
+        self.results = []
 
     def add(self, result):
-        if not result.is_success():
-            self._is_success = False
-        self._results.append(result)
+        self.results.append(result)
 
     @property
     def output(self):
@@ -70,4 +62,9 @@ class ResultSet(BaseResult):
     def is_success(self):
         if len(self.results) == 0:
             return False
-        return self._is_success
+        is_success = True
+        for result in self.results:
+            if not result.is_success():
+                is_success = False
+                break
+        return is_success

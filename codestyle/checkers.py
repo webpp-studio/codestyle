@@ -66,7 +66,7 @@ class BaseChecker(object):
             kwargs['stdout'] = DEVNULL
         p = subprocess.Popen(command_args, **kwargs)
         output = p.communicate()[0]
-        return Result(files, output, p.returncode)
+        return Result(files, p.returncode, output)
 
     def check(self, files):
         """
