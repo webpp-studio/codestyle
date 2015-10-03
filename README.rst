@@ -7,7 +7,7 @@ This script checks and auto fixes codestyle for all supported languages:
 2. Python (pep8 and pylint)
 3. Javascript (jscs and jshint)
 4. CSS (csscomb)
-4. HTML (htmlcs) - without in place fix support
+5. HTML (htmlcs) - without in place fix support
 
 Installation
 ------------
@@ -28,7 +28,9 @@ Usage
 
 ::
 
-    usage: codestyle [-h] [-i] [-c] [-s standard-dir] target [target ...]
+    usage: codestyle [-h] [-i] [-ff] [-c] [-s standard-dir]
+                          [-l language name]
+                          target [target ...]
 
     Check and fix code style
 
@@ -37,10 +39,13 @@ Usage
 
     optional arguments:
       -h, --help            show this help message and exit
-      -i, --try-fix         Auto fix codestyle errors
+      -i, --try-fix         auto fix codestyle errors
+      -ff, --fix-only       fix possible errors without extra checking
       -c, --compact         Show compact output
       -s standard-dir, --standard standard-dir
-                            Path to the coding standard directory
+                            path to the coding standard directory
+      -l language name, --language language name
+                            force set language for check
 
 Example
 -------
