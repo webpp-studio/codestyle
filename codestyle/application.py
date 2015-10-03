@@ -82,7 +82,7 @@ class Application(object):
         parser.add_argument('-i', '--try-fix', dest='fix', action='store_true',
                             help='auto fix codestyle errors', default=False)
         parser.add_argument(
-            '-ff', '--fix-only',
+            '-I', '--fix-only',
             dest='fix_only', action='store_true',
             help='fix possible errors without extra checking',
             default=False

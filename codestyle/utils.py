@@ -42,7 +42,7 @@ def check_external_deps():
     """
 
     binaries = ['npm', 'jscs', 'jshint', 'phpcs', 'phpcbf', 'csscomb',
-        'htmlcs']
+                'htmlcs']
     for binary in binaries:
         if not which(binary):
             raise DependencyError('%s is not installed' % binary)
