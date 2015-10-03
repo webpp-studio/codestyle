@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 """Code style checker application"""
 
-from __future__ import absolute_import
 import os
 import sys
 import argparse
 
+from utils import check_external_deps, DependencyError
 import checkers
-from utils import check_external_deps, DependencyError, import_class
 import settings
 
 
