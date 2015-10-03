@@ -29,6 +29,10 @@ class Application(object):
         self.checkers = None
 
     def create_checkers(self):
+        """
+        Create checker instances for extensions
+        """
+
         self.checkers = {}
         for ext, checker_class in self.CHECKERS:
             if not issubclass(checker_class, checkers.BaseChecker):
@@ -41,6 +45,10 @@ class Application(object):
                 self.checkers[ext] = checker_instance
 
     def get_checker(self, ext):
+        """
+        Get checker instance by extension
+        """
+
         if self.checkers is None:
             self.create_checkers()
         return self.checkers.get(ext, None)
@@ -104,7 +112,9 @@ class Application(object):
         sys.exit(retcode)
 
     def process_file(self, path):
-        """Process file to check or keep it"""
+        """
+        Process file to check or keep it
+        """
 
         checker = self.get_checker(os.path.splitext(path)[1])
         if checker is None:
@@ -170,6 +180,7 @@ class Application(object):
 
         self.params = self.parse_cmd_args()
 
+        self.log("Checking external dependencies....")
         try:
             check_external_deps()
         except DependencyError as e:
