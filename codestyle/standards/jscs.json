@@ -66,11 +66,7 @@
     "disallowShorthandArrowFunctions": true,
 
     "disallowSpacesInCallExpression": true,
-
-/*    "disallowSpacesInFunction": {
-        "beforeOpeningRoundBrace": true
-    },
-*/    "disallowSpacesInNamedFunctionExpression": {
+    "disallowSpacesInNamedFunctionExpression": {
         "beforeOpeningRoundBrace": true
     },
     "disallowSpacesInFunctionDeclaration": {
