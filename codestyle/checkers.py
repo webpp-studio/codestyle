@@ -131,14 +131,13 @@ class PythonChecker(BaseChecker):
 
     def get_check_commands(self):
         return (
-            (self.exe('pep8'),),
-            (self.exe('pylint'), '--report=n',
-             '--rcfile=' + self.cfg('pylint')),
+            (self.exe('flake8'), '--config=' + self.cfg('flake8')),
         )
 
     def get_fix_commands(self):
         return (
             (self.exe('autopep8'), '--in-place', '--aggressive'),
+            (self.exe('autoflake'), '--in-place', '--remove-unused-variables'),
         )
 
 

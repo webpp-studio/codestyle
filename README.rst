@@ -4,7 +4,7 @@ Codestyle checker
 This script checks and auto fixes codestyle for all supported languages:
 
 1. PHP (phpcs)
-2. Python (pep8 and pylint)
+2. Python (flake8)
 3. Javascript (jscs and jshint)
 4. CSS (csscomb)
 5. HTML (htmlcs) - without in place fix support
@@ -75,12 +75,9 @@ Dependencies
 3. jshint (global nodejs package)
 4. jscs-fixer (global nodejs package)
 5. jscs (global nodejs package)
-6. pep8
-7. autopep8
-8. pylint
-9. csscomb (NodeJS)
-10. htmlcs (NodeJS)
-11. walk (NodeJS)
-12. brace-expansion (NodeJS)
-
+6. flake8
+7. csscomb (NodeJS)
+8. htmlcs (NodeJS)
+9. walk (NodeJS)
+10. brace-expansion (NodeJS)
 
