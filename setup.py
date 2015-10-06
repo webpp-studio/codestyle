@@ -14,7 +14,7 @@ setup(
     },
     include_package_data=True,
     zip_safe=False,
-    url='https://github.com/selevit/codestyle',
+    url='https://github.com/webpp-studio/codestyle',
     license='GPL licence, see LICENCE',
     description='Extendable codestyle checker and fixer',
     long_description=open('README.rst').read(),

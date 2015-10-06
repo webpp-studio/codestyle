@@ -40,7 +40,7 @@ Usage
     optional arguments:
       -h, --help            show this help message and exit
       -i, --try-fix         auto fix codestyle errors
-      -ff, --fix-only       fix possible errors without extra checking
+      -I --fix-only       fix possible errors without extra checking
       -c, --compact         Show compact output
       -s standard-dir, --standard standard-dir
                             path to the coding standard directory
