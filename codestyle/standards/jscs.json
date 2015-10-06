@@ -1,6 +1,6 @@
 {
     "validateIndentation": 4,
-    "validateLineBreaks": "CRLF",
+    "validateLineBreaks": "LF",
     "validateQuoteMarks": {
         "mark": "'",
         "escape": true
@@ -42,7 +42,6 @@
     "requireSpaceBeforeObjectValues": true,
 
     "disallowArrowFunctions": true,
-    "disallowDanglingUnderscores": true,
     "disallowEmptyBlocks": true,
     "disallowImplicitTypeConversion": ["numeric", "binary", "string"],
     "disallowMixedSpacesAndTabs": true,
@@ -66,18 +65,21 @@
     "disallowQuotedKeysInObjects": true,
     "disallowShorthandArrowFunctions": true,
 
-
     "disallowSpacesInCallExpression": true,
-    "disallowSpacesInAnonymousFunctionExpression": {
+
+/*    "disallowSpacesInFunction": {
         "beforeOpeningRoundBrace": true
     },
-    "disallowSpacesInFunction": {
+*/    "disallowSpacesInNamedFunctionExpression": {
         "beforeOpeningRoundBrace": true
     },
-    "requireSpacesInFunction": {
-        "beforeOpeningCurlyBrace": true,
+    "disallowSpacesInFunctionDeclaration": {
         "beforeOpeningRoundBrace": true
     },
+    "requireSpacesInAnonymousFunctionExpression": {
+        "beforeOpeningRoundBrace": true
+    },
+
     "requireParenthesesAroundIIFE": true,
 
     "disallowSpacesInsideArrayBrackets": "nested",
@@ -110,8 +112,7 @@
     "requireCurlyBraces": true,
     "requireDollarBeforejQueryAssignment": true,
     "requireDotNotation": true,
-    "requireKeywordsOnNewLine": ["else", "catch"],
     "requireLineBreakAfterVariableAssignment": true,
-    "requireLineFeedAtFileEnd": true,
-    "requireNamedUnassignedFunctions": true
+    "disallowKeywordsOnNewLine": ["else", "catch"],
+    "requireLineFeedAtFileEnd": true
 }
