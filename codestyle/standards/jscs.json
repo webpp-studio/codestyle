@@ -110,5 +110,10 @@
     "requireDotNotation": true,
     "requireLineBreakAfterVariableAssignment": true,
     "disallowKeywordsOnNewLine": ["else", "catch"],
+    "requireSpaceBeforeKeywords": [
+        "else",
+        "while",
+        "catch"
+    ],
     "requireLineFeedAtFileEnd": true
 }

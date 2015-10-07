@@ -154,7 +154,7 @@ class LessChecker(BaseChecker):
 
     def get_fix_commands(self):
         return (
-            (self.exe('csscomb'), '--lint', '--verbose',
+            (self.exe('csscomb'), '--verbose',
              '--config', self.cfg('csscomb')),
         )
 
