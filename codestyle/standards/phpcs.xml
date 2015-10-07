@@ -30,9 +30,9 @@
 <rule ref="Generic.WhiteSpace.DisallowTabIndent"/>
 <rule ref="Generic.WhiteSpace.ScopeIndent"/>
 <rule ref="PEAR.Classes.ClassDeclaration"/>
-<rule ref="PEAR.Commenting.ClassComment"/>
+<!--<rule ref="PEAR.Commenting.ClassComment"/>
 <rule ref="PEAR.Commenting.FunctionComment"/>
-<rule ref="PEAR.Commenting.InlineComment"/>
+<rule ref="PEAR.Commenting.InlineComment"/>-->
 <rule ref="PEAR.ControlStructures.ControlSignature"/>
 <rule ref="PEAR.ControlStructures.MultiLineCondition"/>
 <rule ref="PEAR.Files.IncludingFile"/>
@@ -51,7 +51,7 @@
 <rule ref="PSR2.Methods.MethodDeclaration"/>
 <rule ref="PSR2.Namespaces.NamespaceDeclaration"/>
 <rule ref="PSR2.Namespaces.UseDeclaration"/>
-<rule ref="Squiz.PHP.CommentedOutCode"/>
+<!--<rule ref="Squiz.PHP.CommentedOutCode"/>-->
 <rule ref="Squiz.PHP.DisallowSizeFunctionsInLoops"/>
 <rule ref="Squiz.PHP.DiscouragedFunctions">
     <properties>
