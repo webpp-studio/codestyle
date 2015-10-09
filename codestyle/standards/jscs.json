@@ -102,7 +102,7 @@
 
     "requireBlocksOnNewline": true,
 
-    "requireCapitalizedComments": true,
+    "requireCapitalizedComments": {"allExcept": ["global"]},
     "requireCapitalizedConstructors": true,
     "requireCommaBeforeLineBreak": true,
     "requireCurlyBraces": true,
