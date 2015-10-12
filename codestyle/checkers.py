@@ -6,6 +6,7 @@ from subprocess import STDOUT
 from abc import ABCMeta, abstractmethod
 
 from result import Result, ResultSet
+from settings import parser
 
 
 DEVNULL = open(os.devnull, 'wb')
@@ -114,13 +115,18 @@ class PHPChecker(BaseChecker):
 
     def get_check_commands(self):
         return (
-            (self.exe('phpcs'), '--standard=' + self.cfg('phpcs')),
-            # TODO: phpmd
+            (self.exe('phpcs'), '--standard=' + self.cfg('phpcs'),
+             '--encoding=' + parser.get('phpcs', 'encoding', 'utf-8'),
+             '--runtime-set', 'ignore_warnings_on_exit', 'true',
+            ),
         )
 
     def get_fix_commands(self):
         return (
-            (self.exe('phpcbf'), '--standard=' + self.cfg('phpcs')),
+            (self.exe('phpcbf'), '--standard=' + self.cfg('phpcs'),
+             '--encoding=' + parser.get('phpcs', 'encoding', 'utf-8'),
+             '--runtime-set', 'ignore_warnings_on_exit', 'true',
+            ),
         )
 
 

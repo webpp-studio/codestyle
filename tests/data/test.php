@@ -1,11 +1,17 @@
 <?php
-function test_func($arg1, $arg2)
+
+function testMyFunc($arg1, $arg2)
 {
     return 100 * 0.1;
 }
 
 
-function test_my_func( $arg1, $agg   ) 
+function testMyFunc( $arg1, $agg   )
 {
     return 100 / 20;
+}
+
+function test()
+{
+    return "тестовая длинная строка не-ansi символов для проверки длины";
 }
