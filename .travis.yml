@@ -1,13 +1,12 @@
 language: python
 python:
   - "2.7"
-  - "pypy"
 # command to install dependencies
 before_install:
   - sudo apt-get install -y python-software-properties
   - sudo apt-add-repository -y ppa:chris-lea/node.js
   - sudo apt-get update -y
-  - sudo apt-get install -y python-pip nodejs nodejs-dev npm php-pear libxml2-dev
+  - sudo apt-get install -y python-pip nodejs-dev npm php-pear libxml2-dev
   - sudo apt-get install -y build-essential python-dev libjpeg-dev libpng-dev
   - sudo npm install -g jshint jscs-fixer csscomb htmlcs walk brace-expansion
   - sudo pear install PHP_CodeSniffer
