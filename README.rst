@@ -1,11 +1,6 @@
 Codestyle checker
 =================
 
-.. image:: https://travis-ci.org/webpp-studio/codestyle.svg?branch=master
-    :target: https://travis-ci.org/webpp-studio/codestyle
-
-
-
 This script checks and auto fixes codestyle for all supported languages:
 
 1. PHP (phpcs)
