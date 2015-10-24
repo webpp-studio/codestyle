@@ -7,7 +7,7 @@ This script checks and auto fixes codestyle for all supported languages:
 2. Python (flake8)
 3. Javascript (jscs and jshint)
 4. CSS (csscomb)
-5. HTML (htmlcs) - without in place fix support
+5. HTML (htmlcs)
 
 Installation
 ------------
@@ -72,12 +72,11 @@ Dependencies
 
 1. phpcs
 2. phpcbf
-3. jshint (global nodejs package)
-4. jscs-fixer (global nodejs package)
-5. jscs (global nodejs package)
+3. jshint (NodeJS)
+4. jscs-fixer (NodeJS)
+5. jscs (NodeJS)
 6. flake8
 7. csscomb (NodeJS)
-8. htmlcs (NodeJS)
+8. htmlcs >= 0.1.4 (NodeJS)
 9. walk (NodeJS)
 10. brace-expansion (NodeJS)
-

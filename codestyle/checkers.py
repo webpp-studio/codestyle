@@ -174,3 +174,9 @@ class HTMLChecker(BaseChecker):
         return (
             (self.exe('htmlcs'), 'hint'),
         )
+
+    def get_fix_commands(self):
+        return (
+            (self.exe('htmlcs'), 'format', '--in-place',
+             '--config', self.cfg('htmlcs')),
+        )
