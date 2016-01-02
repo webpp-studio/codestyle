@@ -34,7 +34,7 @@ CHECKER_CFG = {
     'csscomb': parser.get('checker_cfg_name', 'csscomb', 'csscomb.json'),
     'phpcs': parser.get('checker_cfg_name', 'phpcs', 'phpcs.xml'),
     'htmlcs': parser.get('checker_cfg_name', 'htmlcs', 'htmlcs.json'),
-    'flake8': parser.get('checker_cfg_name', 'htmlcs', 'flake8.conf'),
+    'flake8': parser.get('checker_cfg_name', 'flake8', 'flake8.conf'),
 }
 
 # Default coding standard directory (with checker config files)
