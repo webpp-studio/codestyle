@@ -6,8 +6,6 @@ python:
 # command to install dependencies
 before_install:
   - sudo apt-get install -y software-properties-common
-  - sudo apt-add-repository -y ppa:chris-lea/node.js
-  - sudo apt-get update -y
   - sudo apt-get install -y python-pip nodejs npm php-pear libxml2-dev
   - sudo apt-get install -y build-essential python-dev libjpeg-dev libpng-dev
   - sudo npm install -g jshint jscs-fixer csscomb htmlcs walk brace-expansion
