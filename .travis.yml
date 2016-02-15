@@ -5,7 +5,7 @@ python:
   - "2.7"
 # command to install dependencies
 before_install:
-  - sudo apt-get install -y python-software-properties
+  - sudo apt-get install -y software-properties-common
   - sudo apt-add-repository -y ppa:chris-lea/node.js
   - sudo apt-get update -y
   - sudo apt-get install -y python-pip nodejs npm php-pear libxml2-dev
