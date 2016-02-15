@@ -12,6 +12,6 @@ before_install:
   - sudo npm install -g jshint jscs-fixer csscomb htmlcs walk brace-expansion
   - sudo pear install PHP_CodeSniffer
 install:
-  - pip install -r requirements.txt
+  - python setup.py install
 # command to run tests
 script: python runtests.py
