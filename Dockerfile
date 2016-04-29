@@ -5,5 +5,6 @@ RUN apt-get update -qq && apt-get install -yq \
 RUN pip install codestyle
 RUN npm install -g jshint jscs jscs-fixer csscomb htmlcs walk brace-expansion
 RUN pear install PHP_CodeSniffer
+RUN ln -s /usr/bin/nodejs /usr/bin/node
 
 ENTRYPOINT ["codestyle"]
