@@ -30,25 +30,27 @@ Usage
 -----
 
 ::
+  usage: codestyle [-h] [-I] [-i] [-c] [-s standard-dir] [-l language name]
+                   [-e glob pattern [glob pattern ...]]
+                   target [target ...]
 
-    usage: codestyle [-h] [-i] [-ff] [-c] [-s standard-dir]
-                          [-l language name]
-                          target [target ...]
+  Check and fix a code style
 
-    Check and fix code style
+  positional arguments:
+    target                files for a checking
 
-    positional arguments:
-      target                files for checking
+  optional arguments:
+    -h, --help            show this help message and exit
+    -I, --fix             auto fix codestyle errors if possible
+    -i, --fix-only        Deprecated. Same as -I
+    -c, --compact         Show a compact output
+    -s standard-dir, --standard standard-dir
+                          A path to a coding standard directory
+    -l language name, --language language name
+                          force set the language for a checking
+    -e glob pattern [glob pattern ...], --exclude glob pattern [glob pattern ...]
+                          Exclude paths/files from checking
 
-    optional arguments:
-      -h, --help            show this help message and exit
-      -i, --try-fix         auto fix codestyle errors
-      -I --fix-only       fix possible errors without extra checking
-      -c, --compact         Show compact output
-      -s standard-dir, --standard standard-dir
-                            path to the coding standard directory
-      -l language name, --language language name
-                            force set language for check
 
 Example
 -------
@@ -57,16 +59,14 @@ Example
 
     # check all supported files in directory recursive
     codestyle /path/to/project/dir
-
     # check set of files
     codestyle test.js test.php test.py
-
+    # test directory with exclude rules
+    codestyle /path -x '*.html' -x './tests/excluded_dir'
     # check file and try to fix errors
     codestyle -i test.js
-
     # check project with compact output (no detail errors information)
     codestyle -c /path/to/project/dir
-
     # check all project and save full report to file
     codestyle /path/to/project &> report.txt
 
@@ -89,4 +89,3 @@ Usage from the docker container
 
 Also you can use `the docker container <https://hub.docker.com/r/webpp/codestyle>`_
 with all installed dependencies.
-
