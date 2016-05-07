@@ -6,6 +6,8 @@ Code style checker application
 import os
 import sys
 import argparse
+import fnmatch
+import re
 
 from utils import check_external_deps, DependencyError
 import checkers
@@ -30,6 +32,7 @@ class Application(object):
         self.settings = settings
         self.params = None
         self.checkers = None
+        self.excludes = []
 
     def create_checkers(self):
         """
@@ -79,27 +82,35 @@ class Application(object):
         """
 
         parser = argparse.ArgumentParser(
-            description='Check and fix code style')
+            description='Check and fix a code style')
         parser.add_argument('target', metavar='target', type=str, nargs='+',
-                            help='files for checking')
-        parser.add_argument('-i', '--try-fix', dest='fix', action='store_true',
-                            help='auto fix codestyle errors', default=False)
+                            help='files for a checking')
         parser.add_argument(
-            '-I', '--fix-only',
-            dest='fix_only', action='store_true',
-            help='fix possible errors without extra checking',
+            '-I', '--fix',
+            dest='fix', action='store_true',
+            help='auto fix codestyle errors if possible',
+            default=False
+        )
+        parser.add_argument(
+            '-i', '--fix-only',
+            dest='fix', action='store_true',
+            help='Deprecated. Same as -I',
             default=False
         )
         parser.add_argument('-c', '--compact', dest='compact',
-                            action='store_true', help='Show compact output',
+                            action='store_true', help='Show a compact output',
                             default=False)
         parser.add_argument('-s', '--standard', dest='standard', type=str,
-                            help='path to the coding standard directory',
+                            help='A path to a coding standard directory',
                             default=self.settings.DEFAULT_STANDARD_DIR,
                             metavar='standard-dir')
         parser.add_argument('-l', '--language', dest='language', type=str,
-                            help='force set language for check',
+                            help='force set the language for a checking',
                             metavar='language name', default=None)
+        parser.add_argument('-e', '--exclude', dest='exclude', type=str,
+                            help='Exclude paths /files from checking',
+                            metavar='glob pattern', nargs='+',
+                            default=tuple())
         return parser.parse_args()
 
     def check_force_language(self, language):
@@ -122,14 +133,14 @@ class Application(object):
 
     def get_standard_dir(self):
         """
-        Get coding standard directory path
+        Get a path of a coding standard directory
         """
 
         return self.params.standard
 
     def log(self, string, newline=True, buf=sys.stdout):
         """
-        Log message to STDOUT
+        Log a message to the STDOUT
         """
 
         if newline:
@@ -138,14 +149,14 @@ class Application(object):
 
     def log_error(self, string, newline=True):
         """
-        Log error message (to STDERR)
+        Log an error message to the STDERR
         """
 
         self.log(string, newline, sys.stderr)
 
     def exit_with_error(self, message, retcode=1):
         """
-        Put error message to STDERR and exit
+        Put an error message to the STDERR and exit
         """
 
         self.log_error("%s: %s" % (sys.argv[0], message))
@@ -153,7 +164,7 @@ class Application(object):
 
     def process_file(self, path):
         """
-        Process file to check or keep it
+        Process a file (to check or pass it)
         """
 
         checker = self.get_checker(os.path.splitext(path)[1])
@@ -166,33 +177,29 @@ class Application(object):
             self.log("Processing: " + path + "...")
 
         result = None
-        if not self.params.fix_only:
+
+        if self.params.fix:
+            try:
+                result = checker.fix(path)
+                if self.params.compact:
+                    if result.is_success():
+                        self.log("Some errors has been fixed\n")
+                    else:
+                        self.log("No errors has been fixed\n")
+            except NotImplementedError:
+                self.log_error(
+                    "Auto fixing is not supported for this language\n"
+                )
+        else:
             result = checker.check(path)
             if self.params.compact:
                 if result.is_success():
-                    self.log(" OK")
+                    self.log(" Done")
                 else:
                     self.log(" Fail")
             else:
                 if result.output:
                     self.log("\n")
-        else:
-            self.log("")
-
-        if self.params.fix or self.params.fix_only:
-            try:
-                fix_result = checker.fix(path)
-                if self.params.compact:
-                    if fix_result.is_success():
-                        self.log("Some errors has been fixed\n")
-                    else:
-                        self.log("Cannot fix errors\n")
-                if self.params.fix_only:
-                    result = fix_result
-            except NotImplementedError:
-                self.log_error(
-                    "Auto fixing is not supported for this language\n"
-                )
 
         return result
 
@@ -201,9 +208,15 @@ class Application(object):
         Check code in directory (recursive)
         """
 
-        for root, _, files in os.walk(path):
-            for subfile in files:
-                yield self.process_file(os.path.join(root, subfile))
+        for root, dirs, files in os.walk(path):
+            # Exclude dirs
+            dirs[:] = [d for d in dirs if not re.match(
+                self.excludes, os.path.join(root, d))]
+            # Exclude files
+            files = [os.path.join(root, f) for f in files]
+            files = [f for f in files if not re.match(self.excludes, f)]
+            for file in files:
+                yield self.process_file(file)
 
     def process_path(self, path):
         """
@@ -211,20 +224,23 @@ class Application(object):
         """
 
         if not os.path.exists(path):
-            self.exit_with_error("no such file or directory: " + path)
+            self.exit_with_error("No such file or directory: " + path)
         elif os.path.isfile(path):
-            yield self.process_file(path)
+            if not re.match(self.excludes, path):
+                yield self.process_file(path)
         elif os.path.isdir(path):
             for result in self.process_dir(path):
                 yield result
 
     def run(self):
         """
-        Run code checking
+        Run a code checking
         """
 
         self.params = self.parse_cmd_args()
         self.check_force_language(self.params.language)
+        self.excludes = r'|'.join(
+            [fnmatch.translate(x) for x in self.params.exclude]) or r'$.'
 
         self.log("Checking external dependencies....")
 
@@ -239,11 +255,12 @@ class Application(object):
 
         for path in self.params.target:
             for result in self.process_path(path):
-                if result is not None:
-                    if result.is_success():
-                        total_success += 1
-                    else:
-                        total_failed += 1
+                if result is None:
+                    continue
+                if result.is_success():
+                    total_success += 1
+                else:
+                    total_failed += 1
 
         self.log("Total success: %d" % total_success)
         self.log("Total failed: %s" % total_failed)
