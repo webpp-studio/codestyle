@@ -30,6 +30,7 @@ Usage
 -----
 
 ::
+
   usage: codestyle [-h] [-I] [-i] [-c] [-s standard-dir] [-l language name]
                    [-e glob pattern [glob pattern ...]]
                    target [target ...]
