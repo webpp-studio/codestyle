@@ -10,8 +10,6 @@ class DependencyError(BaseException):
     Raises if no some dependency found
     """
 
-    pass
-
 
 def which(program):
     """

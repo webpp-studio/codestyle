@@ -5,7 +5,17 @@ services:
 install:
   - docker build -t codestyle .
 script:
-  - docker run --volume=`pwd`:/code 
+  - docker run --rm --volume=`pwd`:/code 
         --workdir=/code
         --entrypoint=/usr/bin/python
-        webpp/codestyle runtests.py
+        codestyle runtests.py
+  - docker run --rm --volume=`pwd`:/code
+      --workdir=/code
+      codestyle
+      ./codestyle
+      ./*.py
+      ./tests/*.py
+  - docker run --rm --volume=`pwd`:/code
+      --workdir=/code
+      codestyle --language py
+      ./scripts/codestyle

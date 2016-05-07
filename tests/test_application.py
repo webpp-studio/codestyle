@@ -46,4 +46,3 @@ class TestApplication(unittest.TestCase):
                               checkers.PHPChecker)
         self.assertIsInstance(self.application.get_checker('.php'),
                               checkers.PHPChecker)
-

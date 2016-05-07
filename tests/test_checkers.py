@@ -3,7 +3,6 @@ import argparse
 
 from codestyle import application
 from codestyle import checkers
-from codestyle.result import BaseResult
 
 
 class TestJSChecker(unittest.TestCase):
@@ -30,6 +29,3 @@ class TestJSChecker(unittest.TestCase):
         self.assertIsInstance(commands, (list, tuple))
         for command in commands:
             self.assertIsInstance(command, (list, tuple))
-
-
-

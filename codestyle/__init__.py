@@ -2,4 +2,4 @@
 Extendable codestyle checker and fixer
 """
 
-from application import Application
+from application import Application  # NOQA
