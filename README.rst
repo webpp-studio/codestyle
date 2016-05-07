@@ -87,6 +87,6 @@ Dependencies
 Usage from the docker container
 -------------------------------
 
-Also you can use `the docker container <https://hub.docker.com/webpp/codestyle>`_
+Also you can use `the docker container <https://hub.docker.com/r/webpp/codestyle>`_
 with all installed dependencies.
 
