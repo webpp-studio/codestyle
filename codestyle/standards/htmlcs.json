@@ -16,10 +16,10 @@
     "ie-edge": true,                        // true: <meta http-equiv="X-UA-Compatible" content="IE=Edge"> required
     "img-alt": true,                        // true: Attribute "alt" of <img> should be set
     "img-src": true,                        // true: Attribute "src" of <img> should not be empty
-    "img-title": true,                      // true: Attribute "title" of <img> should not be set
-    "img-width-height": true,               // true: Attribute "width" & "height" of <img> should be set
+    "img-title": false,                      // true: Attribute "title" of <img> should not be set
+    "img-width-height": false,               // true: Attribute "width" & "height" of <img> should be set
     "indent-char": "space-4",               // "space-4": Line should indent with 4 spaces.
-    "lowercase-class-with-hyphen": true,    // true: ClassName should be lowercase words connected with hyphens
+    "lowercase-class-with-hyphen": false,    // true: ClassName should be lowercase words connected with hyphens
     "lowercase-id-with-hyphen": true,       // true: Id should be lowercase words connected with hyphens
     "rel-stylesheet": true,                 // true: Attribute "rel" of imported css (<link>) should be set as "stylesheet"
     "script-content": true,                 // true: Content of <script> must meet standard
