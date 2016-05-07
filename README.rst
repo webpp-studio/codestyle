@@ -83,3 +83,10 @@ Dependencies
 8. htmlcs >= 0.1.4 (NodeJS)
 9. walk (NodeJS)
 10. brace-expansion (NodeJS)
+
+Usage from the docker container
+-------------------------------
+
+Also you can use `the docker container <https://hub.docker.com/webpp/codestyle>`_
+with all installed dependencies.
+
