@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='codestyle',
-    version='0.1.2',
+    version='0.1.3',
     author=u'Sergey Levitin',
     author_email='selevit@gmail.com',
     packages=find_packages(),
@@ -24,7 +24,8 @@ setup(
         'pyflakes>=0.8.1,<0.9',
         'autopep8>=1.2,<=1.2.99',
         'flake8>=2.4,<=2.4.99',
-        'autoflake>=0.6,<=0.6.99'
+        'autoflake>=0.6,<=0.6.99',
+        'mock>=2.0,<=2.0.99',
     ],
     test_suite='tests'
 )

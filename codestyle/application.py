@@ -76,7 +76,7 @@ class Application(object):
 
         return os.path.join(self.get_standard_dir(), filename)
 
-    def parse_cmd_args(self):
+    def parse_cmd_args(self, args=None):
         """
         Get parsed command line arguments
         """
@@ -111,7 +111,7 @@ class Application(object):
                             help='Exclude paths/files from checking',
                             metavar='glob pattern', nargs='+',
                             default=tuple())
-        return parser.parse_args()
+        return parser.parse_args(args)
 
     def check_force_language(self, language):
         """
