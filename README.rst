@@ -63,7 +63,7 @@ Example
     # check set of files
     codestyle test.js test.php test.py
     # test directory with exclude rules
-    codestyle /path -x '*.html' -x './tests/excluded_dir'
+    codestyle /path -e '*.html','./tests/excluded_dir'
     # check file and try to fix errors
     codestyle -i test.js
     # check project with compact output (no detail errors information)
