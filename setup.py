@@ -23,6 +23,7 @@ setup(
     long_description=open('README.rst').read(),
     scripts=['scripts/codestyle'],
     install_requires=[
+        'future',
         'pep8>=1.5.7,<1.6',
         'pyflakes>=0.8.1,<0.9',
         'autopep8>=1.2,<=1.2.99',
