@@ -32,7 +32,7 @@ class Application(object):
         self.settings = settings
         self.params = None
         self.checkers = None
-        self.excludes = []
+        self.excludes = '$.'
 
     def create_checkers(self):
         """
@@ -108,7 +108,7 @@ class Application(object):
                             help='force set the language for a checking',
                             metavar='language name', default=None)
         parser.add_argument('-e', '--exclude', dest='exclude', type=str,
-                            help='Exclude paths /files from checking',
+                            help='Exclude paths/files from checking',
                             metavar='glob pattern', nargs='+',
                             default=tuple())
         return parser.parse_args()
