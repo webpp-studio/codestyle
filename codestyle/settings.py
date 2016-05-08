@@ -1,5 +1,7 @@
+from future import standard_library
+standard_library.install_aliases()
 import os
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 
 # Base project root
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -15,29 +17,29 @@ parser.read([DEFAULT_CONFIG_FILE, USER_CONFIG_FILE])
 
 # Executable names
 CHECKER_EXE = {
-    'jshint': parser.get('exe', 'jshint', 'jshint'),
-    'jscs': parser.get('exe', 'jscs', 'jscs'),
-    'csscomb': parser.get('exe', 'csscomb', 'csscomb'),
-    'pep8': parser.get('exe', 'pep8', 'pep8'),
-    'autopep8': parser.get('exe', 'autopep8', 'autopep8'),
-    'phpcs': parser.get('exe', 'phpcs', 'phpcs'),
-    'phpcbf': parser.get('exe', 'phpcbf', 'phpcbf'),
-    'htmlcs': parser.get('exe', 'htmlcs', 'htmlcs'),
-    'flake8': parser.get('exe', 'flake8', 'flake8'),
-    'autoflake': parser.get('exe', 'autoflake', 'autoflake'),
+    'jshint': parser.get('exe', 'jshint', fallback='jshint'),
+    'jscs': parser.get('exe', 'jscs', fallback='jscs'),
+    'csscomb': parser.get('exe', 'csscomb', fallback='csscomb'),
+    'pep8': parser.get('exe', 'pep8', fallback='pep8'),
+    'autopep8': parser.get('exe', 'autopep8', fallback='autopep8'),
+    'phpcs': parser.get('exe', 'phpcs', fallback='phpcs'),
+    'phpcbf': parser.get('exe', 'phpcbf', fallback='phpcbf'),
+    'htmlcs': parser.get('exe', 'htmlcs', fallback='htmlcs'),
+    'flake8': parser.get('exe', 'flake8', fallback='flake8'),
+    'autoflake': parser.get('exe', 'autoflake', fallback='autoflake'),
 }
 
 # Config names for checkers
 CHECKER_CFG = {
-    'jshint': parser.get('checker_cfg_name', 'jshint', 'jshint.json'),
-    'jscs': parser.get('checker_cfg_name', 'jscs', 'jscs.json'),
-    'csscomb': parser.get('checker_cfg_name', 'csscomb', 'csscomb.json'),
-    'phpcs': parser.get('checker_cfg_name', 'phpcs', 'phpcs.xml'),
-    'htmlcs': parser.get('checker_cfg_name', 'htmlcs', 'htmlcs.json'),
-    'flake8': parser.get('checker_cfg_name', 'flake8', 'flake8.conf'),
+    'jshint': parser.get('checker_cfg_name', 'jshint', fallback='jshint.json'),
+    'jscs': parser.get('checker_cfg_name', 'jscs', fallback='jscs.json'),
+    'csscomb': parser.get('checker_cfg_name', 'csscomb', fallback='csscomb.json'),
+    'phpcs': parser.get('checker_cfg_name', 'phpcs', fallback='phpcs.xml'),
+    'htmlcs': parser.get('checker_cfg_name', 'htmlcs', fallback='htmlcs.json'),
+    'flake8': parser.get('checker_cfg_name', 'flake8', fallback='flake8.conf'),
 }
 
 # Default coding standard directory (with checker config files)
-DEFAULT_STANDARD_DIR = parser.get('path', 'default_standard_dir', '')
+DEFAULT_STANDARD_DIR = parser.get('path', 'default_standard_dir', fallback='')
 if not DEFAULT_STANDARD_DIR:
     DEFAULT_STANDARD_DIR = os.path.join(BASE_DIR, 'standards')
