@@ -75,12 +75,10 @@ class TestApplication(unittest.TestCase):
         self.assertEqual(params.target, ['test1.js', 'test2.html'])
 
         params = self.application.parse_cmd_args(
-            ['-I', 'test.js'])
+            ['-i', 'test.js'])
         self.assertTrue(params.fix)
-
-        params = self.application.parse_cmd_args(['-i',
-            'test.js'])
-        self.assertTrue(params.fix)
+        params = self.application.parse_cmd_args(
+            ['--fix', 'test.js'])
 
         params = self.application.parse_cmd_args(
             ['-c', 'test.js'])

@@ -86,15 +86,9 @@ class Application(object):
         parser.add_argument('target', metavar='target', type=str, nargs='+',
                             help='files for a checking')
         parser.add_argument(
-            '-I', '--fix',
+            '-i', '--fix',
             dest='fix', action='store_true',
             help='auto fix codestyle errors if possible',
-            default=False
-        )
-        parser.add_argument(
-            '-i', '--fix-only',
-            dest='fix', action='store_true',
-            help='Deprecated. Same as -I',
             default=False
         )
         parser.add_argument('-c', '--compact', dest='compact',
