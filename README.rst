@@ -42,14 +42,13 @@ Usage
 
   optional arguments:
     -h, --help            show this help message and exit
-    -I, --fix             auto fix codestyle errors if possible
-    -i, --fix-only        Deprecated. Same as -I
+    -i, --fix             auto fix codestyle errors if possible
     -c, --compact         Show a compact output
     -s standard-dir, --standard standard-dir
                           A path to a coding standard directory
     -l language name, --language language name
                           force set the language for a checking
-    -e glob pattern [glob pattern ...], --exclude glob pattern [glob pattern ...]
+    -x glob pattern [glob pattern ...], --exclude glob pattern [glob pattern ...]
                           Exclude paths/files from checking
 
 
@@ -63,7 +62,7 @@ Example
     # check set of files
     codestyle test.js test.php test.py
     # test directory with exclude rules
-    codestyle /path -x '*.html' -x './tests/excluded_dir'
+    codestyle /path -x '*.html' './tests/excluded_dir'
     # check file and try to fix errors
     codestyle -i test.js
     # check project with compact output (no detail errors information)

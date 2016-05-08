@@ -101,7 +101,7 @@ class Application(object):
         parser.add_argument('-l', '--language', dest='language', type=str,
                             help='force set the language for a checking',
                             metavar='language name', default=None)
-        parser.add_argument('-e', '--exclude', dest='exclude', type=str,
+        parser.add_argument('-x', '--exclude', dest='exclude', type=str,
                             help='Exclude paths/files from checking',
                             metavar='glob pattern', nargs='+',
                             default=tuple())

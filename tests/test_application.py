@@ -6,7 +6,7 @@ import mock
 
 from codestyle import application
 from codestyle import checkers
-from codestyle import  settings
+from codestyle import settings
 
 
 class TestApplication(unittest.TestCase):
@@ -54,7 +54,7 @@ class TestApplication(unittest.TestCase):
 
     @mock.patch('codestyle.application.os')
     def test_get_config_path(self, mock_os):
-        path = self.application.get_config_path('file1')
+        self.application.get_config_path('file1')
         standard_dir = self.application.get_standard_dir()
         mock_os.path.join.assert_called_with(standard_dir, 'file1')
 
@@ -95,11 +95,47 @@ class TestApplication(unittest.TestCase):
         self.assertEqual(params.language, 'html')
 
         params = self.application.parse_cmd_args(
-            ['test.php', '-e', '/test/dir/', '*.html']
+            ['test.php', '-x', '/test/dir/', '*.html']
         )
         self.assertEqual(params.exclude,
-            ['/test/dir/', '*.html'])
+                         ['/test/dir/', '*.html'])
         params = self.application.parse_cmd_args(
             ['--exclude=/test/dir/', 'test.php']
         )
         self.assertEqual(params.exclude, ['/test/dir/'])
+
+    def test_get_standard_dir(self):
+        # Check if default standard dir exists
+        self.assertTrue(
+            os.path.exists(self.application.get_standard_dir())
+        )
+
+    def test_log(self):
+        buf_mock = mock.Mock()
+        self.application.log('Hello', buf=buf_mock)
+        buf_mock.write.assert_called_with('Hello\n')
+        buf_mock = mock.Mock()
+        self.application.log('Hello', newline=True,
+                             buf=buf_mock)
+        buf_mock.write.assert_called_with('Hello\n')
+
+    @mock.patch('codestyle.application.sys.stderr')
+    def test_log_error(self, stderr_mock):
+        self.application.log_error('Hello')
+        stderr_mock.write.assert_called_with('Hello\n')
+        self.application.log_error('Hello', False)
+        stderr_mock.write.assert_called_with('Hello')
+
+    @mock.patch('codestyle.application.sys')
+    def test_exit_with_error(self, sys_mock):
+        self.application.exit_with_error(
+            'Test message'
+        )
+        sys_mock.exit.assert_called_with(1)
+        self.application.exit_with_error(
+            'Test message', 2
+        )
+        sys_mock.stderr.write.assert_called_with(
+            "%s: %s\n" % (sys_mock.argv[0], 'Test message')
+        )
+        sys_mock.exit.assert_called_with(2)
