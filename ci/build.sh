@@ -2,4 +2,4 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 echo "Building the \"codestyle\" docker container"
-docker build -t codestyle "$DIR/.."
+docker build -t codestyle "$DIR"
