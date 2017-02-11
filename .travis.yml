@@ -6,4 +6,5 @@ services:
 #install:
 #  - ./ci/build.sh
 script:
+  - apt install python-tox
   - tox
