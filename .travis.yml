@@ -7,6 +7,6 @@ services:
 #  - ./ci/build.sh
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq python-tox
+  - sudo apt-get install -qq python3 python3-pip nodejs npm php-pear python-setuptools python3-setuptools
 script:
   - tox
