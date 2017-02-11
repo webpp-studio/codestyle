@@ -1,6 +1,6 @@
+#!/usr/bin/env python2
 from __future__ import absolute_import
 from builtins import object
-#!/usr/bin/env python2
 
 import os
 import subprocess

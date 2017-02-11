@@ -1,7 +1,7 @@
 from future import standard_library
-standard_library.install_aliases()
 import os
 from configparser import ConfigParser
+standard_library.install_aliases()
 
 # Base project root
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -33,7 +33,11 @@ CHECKER_EXE = {
 CHECKER_CFG = {
     'jshint': parser.get('checker_cfg_name', 'jshint', fallback='jshint.json'),
     'jscs': parser.get('checker_cfg_name', 'jscs', fallback='jscs.json'),
-    'csscomb': parser.get('checker_cfg_name', 'csscomb', fallback='csscomb.json'),
+    'csscomb': parser.get(
+        'checker_cfg_name',
+        'csscomb',
+        fallback='csscomb.json'
+    ),
     'phpcs': parser.get('checker_cfg_name', 'phpcs', fallback='phpcs.xml'),
     'htmlcs': parser.get('checker_cfg_name', 'htmlcs', fallback='htmlcs.json'),
     'flake8': parser.get('checker_cfg_name', 'flake8', fallback='flake8.conf'),

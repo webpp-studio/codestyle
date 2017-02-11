@@ -2,7 +2,8 @@ sudo: required
 dist: trusty
 services:
   - docker
-install:
-  - ./ci/build.sh
+  - tox
+#install:
+#  - ./ci/build.sh
 script:
-  - ./ci/test.sh
+  - tox
