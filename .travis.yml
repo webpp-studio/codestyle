@@ -5,6 +5,8 @@ services:
   - tox
 #install:
 #  - ./ci/build.sh
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq python-tox
 script:
-  - apt install python-tox
   - tox
