@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import ez_setup
-ez_setup.use_setuptools('33.1.0')
+# import ez_setup
+# ez_setup.use_setuptools('33.1.0')
 from setuptools import setup, find_packages
-
 
 setup(
     name='codestyle',
@@ -36,3 +35,4 @@ setup(
         'six>=1.9'
     ]
 )
+
