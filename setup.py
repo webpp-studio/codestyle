@@ -15,7 +15,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     url='https://github.com/webpp-studio/codestyle',
-    license='GPL licence, see LICENCE',
+    license='GPLv3',
     description='Extendable codestyle checker and fixer',
     long_description=open('README.rst').read(),
     scripts=['scripts/codestyle'],
@@ -36,9 +36,9 @@ setup(
         'Development Status :: 4 - Beta',
 
         'Intended Audience :: Developers',
-        'Topic :: Software Development :: Lint Tools',
+        'Topic :: Software Development :: Quality Assurance',
 
-        'License :: OSI Approved :: GPLv3',
+        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
 
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
