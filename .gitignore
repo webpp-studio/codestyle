@@ -4,5 +4,6 @@
 *egg-info*
 /.eggs
 /.tox
-*.egg
 /*.egg
+*.egg
+*.zip
