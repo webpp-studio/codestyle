@@ -9,7 +9,7 @@ echo
 echo "Checking a self codestyle..."
 # Self-checking (codestyle)
 docker run --rm --volume=`pwd`:/code:ro --workdir=/code codestyle \
-    ./codestyle ./tests ./runtests.py \
+    ./codestyle ./tests ./setup.py ./runtests.py \
     --exclude ./tests/data || exit $?
 echo
 
