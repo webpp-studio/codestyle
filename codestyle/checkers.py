@@ -1,23 +1,24 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
+from __future__ import absolute_import
+from builtins import object
 
 import os
 import subprocess
 from subprocess import STDOUT
 from abc import ABCMeta, abstractmethod
 
-from result import Result, ResultSet
-from settings import parser
+from .result import Result, ResultSet
+from .settings import parser
+from future.utils import with_metaclass
 
 
 DEVNULL = open(os.devnull, 'wb')
 
 
-class BaseChecker(object):
+class BaseChecker(with_metaclass(ABCMeta, object)):
     """
     Base codestyle checker
     """
-
-    __metaclass__ = ABCMeta
 
     def __init__(self, application, **kwargs):
         self.application = application

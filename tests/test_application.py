@@ -30,7 +30,7 @@ class TestApplication(unittest.TestCase):
         self.application.create_checkers()
         self.assertIsInstance(self.application.checkers, dict)
 
-        for val in self.application.checkers.values():
+        for val in list(self.application.checkers.values()):
             self.assertIsInstance(val, checkers.BaseChecker)
 
         self.assertGreater(len(self.application.checkers), 0)

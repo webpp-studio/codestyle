@@ -1,16 +1,17 @@
 """
 Checking result classes
 """
+from builtins import str
+from builtins import object
 
 from abc import ABCMeta, abstractmethod, abstractproperty
+from future.utils import with_metaclass
 
 
-class BaseResult:
+class BaseResult(with_metaclass(ABCMeta, object)):
     """
     Base checking result
     """
-
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def is_success(self):

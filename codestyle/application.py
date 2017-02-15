@@ -2,6 +2,9 @@
 """
 Code style checker application
 """
+from __future__ import absolute_import
+from builtins import str
+from builtins import object
 
 import os
 import sys
@@ -9,9 +12,9 @@ import argparse
 import fnmatch
 import re
 
-from utils import check_external_deps, DependencyError
-import checkers
-import settings
+from .utils import check_external_deps, DependencyError
+from . import checkers
+from . import settings
 
 
 class Application(object):
@@ -121,7 +124,7 @@ class Application(object):
                 "Unsupported language: %s\n"
                 "Supported extensions: %s" % (
                     language,
-                    ', '.join([k for k in checker_map.keys()])
+                    ', '.join([k for k in list(checker_map.keys())])
                 )
             )
 
