@@ -17,4 +17,3 @@ echo "Checking a self codestyle for scripts..."
 # Check codestyle of the single script without extension
 docker run --rm --volume=`pwd`:/code:ro --workdir=/code codestyle \
     --language=py ./scripts/codestyle || exit $?
-

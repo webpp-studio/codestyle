@@ -1,14 +1,11 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import ez_setup
-ez_setup.use_setuptools()
 from setuptools import setup, find_packages
-
 
 setup(
     name='codestyle',
-    version='0.3.3',
+    version='0.4.1',
     author=u'Sergey Levitin',
     author_email='selevit@gmail.com',
     packages=find_packages(),
@@ -27,7 +24,7 @@ setup(
         'pep8>=1.5.7,<1.6',
         'pyflakes>=0.8.1,<0.9',
         'autopep8>=1.2,<=1.2.99',
-        'flake8>=2.4,<=2.4.99',
+        'flake8>=3.2,<=3.2.99',
         'autoflake>=0.6,<=0.6.99',
     ],
     test_suite='tests',
@@ -36,3 +33,4 @@ setup(
         'six>=1.9'
     ]
 )
+
