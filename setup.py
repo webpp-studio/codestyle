@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='codestyle',
-    version='0.4.1',
+    version='0.4.2',
     author=u'Sergey Levitin',
     author_email='selevit@gmail.com',
     packages=find_packages(),
@@ -31,6 +31,19 @@ setup(
     tests_require=[
         'mock>=2.0,<=2.0.99',
         'six>=1.9'
-    ]
-)
+    ],
+    classifiers=[
+        'Development Status :: 4 - Beta',
 
+        'Intended Audience :: Developers',
+        'Topic :: Software Development :: Lint Tools',
+
+        'License :: OSI Approved :: GPLv3',
+
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+    ],
+)
