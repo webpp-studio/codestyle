@@ -117,7 +117,7 @@ class PHPChecker(BaseChecker):
     def get_check_commands(self):
         return (
             (self.exe('phpcs'), '--standard=' + self.cfg('phpcs'),
-             '--encoding=' + parser.get('phpcs', 'encoding', 'utf-8'),
+             '--encoding=' + parser.get('phpcs', 'encoding'),
              '--runtime-set', 'ignore_warnings_on_exit', 'true',
              ),
         )
@@ -125,7 +125,7 @@ class PHPChecker(BaseChecker):
     def get_fix_commands(self):
         return (
             (self.exe('phpcbf'), '--standard=' + self.cfg('phpcs'),
-             '--encoding=' + parser.get('phpcs', 'encoding', 'utf-8'),
+             '--encoding=' + parser.get('phpcs', 'encoding'),
              '--runtime-set', 'ignore_warnings_on_exit', 'true',
              ),
         )
