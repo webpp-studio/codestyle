@@ -108,6 +108,9 @@ class Application(object):
                             help='Exclude paths/files from checking',
                             metavar='glob pattern', nargs='+',
                             default=tuple())
+        parser.add_argument('-q', '--quiet', dest='quiet',
+                            action='store_true', help='Quiets the "Processing: ..." message',
+                            default=False)
         return parser.parse_args(args)
 
     def check_force_language(self, language):
@@ -168,10 +171,11 @@ class Application(object):
         if checker is None:
             return None
 
-        if self.params.compact:
-            self.log("Processing: " + path + "...", False)
-        else:
-            self.log("Processing: " + path + "...")
+        if not self.params.quiet:
+            if self.params.compact:
+                self.log("Processing: " + path + "...", False)
+            else:
+                self.log("Processing: " + path + "...")
 
         result = None
 
@@ -195,7 +199,7 @@ class Application(object):
                 else:
                     self.log(" Fail")
             else:
-                if result.output:
+                if result.output and not self.params.quiet:
                     self.log("\n")
 
         return result
