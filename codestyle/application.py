@@ -171,11 +171,10 @@ class Application(object):
         if checker is None:
             return None
 
-        if not self.params.quiet:
-            if self.params.compact:
-                self.log("Processing: " + path + "...", False)
-            else:
-                self.log("Processing: " + path + "...")
+        if self.params.compact:
+            self.log("Processing: " + path + "...", False)
+        elif not self.params.quiet:
+            self.log("Processing: " + path + "...")
 
         result = None
 
