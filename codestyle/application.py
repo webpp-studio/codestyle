@@ -109,8 +109,8 @@ class Application(object):
                             metavar='glob pattern', nargs='+',
                             default=tuple())
         parser.add_argument('-q', '--quiet', dest='quiet',
-                            action='store_true', help='Quiets the "Processing: ..." message',
-                            default=False)
+                            action='store_true', default=False,
+                            help='Quiets "Processing" message and warnings')
         return parser.parse_args(args)
 
     def check_force_language(self, language):
