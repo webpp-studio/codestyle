@@ -1,0 +1,29 @@
+stages:
+  - tests
+  - build
+
+tests:
+  stage: tests
+  script:
+    - docker build -f tests/Dockerfile -t codestyle/tests .
+    - docker run --rm codestyle/tests
+  only:
+    - branches
+
+build-image:
+  stage: build
+  script:
+    - docker build -t git.webpp.ru:4567/tools/codestyle:$CI_COMMIT_REF_NAME .
+    - docker push git.webpp.ru:4567/tools/codestyle:$CI_COMMIT_REF_NAME
+  only:
+    - branches
+  except:
+    - master
+
+build-image-latest:
+  stage: build
+  script:
+    - docker build -t git.webpp.ru:4567/tools/codestyle:latest .
+    - docker push git.webpp.ru:4567/tools/codestyle:latest
+  only:
+    - master
