@@ -56,7 +56,6 @@
     </properties>
 </rule>
 <rule ref="Squiz.PHP.Eval"/>
-<rule ref="Squiz.PHP.ForbiddenFunctions"/>
 <rule ref="Squiz.PHP.GlobalKeyword"/>
 <rule ref="Squiz.PHP.Heredoc"/>
 <rule ref="Squiz.PHP.NonExecutableCode"/>
