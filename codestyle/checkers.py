@@ -115,10 +115,11 @@ class PHPChecker(BaseChecker):
     """
 
     def get_check_commands(self):
+        no_warnings = '-n' if self.application.params.quiet else ''
         return (
             (self.exe('phpcs'), '--standard=' + self.cfg('phpcs'),
              '--encoding=' + parser.get('phpcs', 'encoding'),
-             '--runtime-set', 'ignore_warnings_on_exit', 'true',
+             '--runtime-set', 'ignore_warnings_on_exit', 'true', no_warnings,
              ),
         )
 
