@@ -104,6 +104,10 @@ class TestApplication(unittest.TestCase):
         )
         self.assertEqual(params.exclude, ['/test/dir/'])
 
+        params = self.application.parse_cmd_args(
+            ['-q', 'test.php'])
+        self.assertTrue(params.quiet)
+
     def test_get_standard_dir(self):
         # Check if default standard dir exists
         self.assertTrue(

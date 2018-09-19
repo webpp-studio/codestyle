@@ -14,7 +14,8 @@ class TestJSChecker(unittest.TestCase):
         self.application = application.Application()
         self.application.params = argparse.Namespace(
             standard=application.settings.DEFAULT_STANDARD_DIR,
-            compact=False
+            compact=False,
+            quiet=False
         )
         self.checker = checkers.JSChecker(self.application)
 
@@ -40,7 +41,8 @@ class TestPHPChecker(unittest.TestCase):
         self.application = application.Application()
         self.application.params = argparse.Namespace(
             standard=application.settings.DEFAULT_STANDARD_DIR,
-            compact=False
+            compact=False,
+            quiet=False
         )
         self.checker = checkers.PHPChecker(self.application)
 
@@ -66,7 +68,8 @@ class TestPythonChecker(unittest.TestCase):
         self.application = application.Application()
         self.application.params = argparse.Namespace(
             standard=application.settings.DEFAULT_STANDARD_DIR,
-            compact=False
+            compact=False,
+            quiet=False
         )
         self.checker = checkers.PythonChecker(self.application)
 
@@ -92,7 +95,8 @@ class TestCSSChecker(unittest.TestCase):
         self.application = application.Application()
         self.application.params = argparse.Namespace(
             standard=application.settings.DEFAULT_STANDARD_DIR,
-            compact=False
+            compact=False,
+            quiet=False
         )
         self.checker = checkers.LessChecker(self.application)
 
@@ -118,7 +122,8 @@ class TestHTMLChecker(unittest.TestCase):
         self.application = application.Application()
         self.application.params = argparse.Namespace(
             standard=application.settings.DEFAULT_STANDARD_DIR,
-            compact=False
+            compact=False,
+            quiet=False
         )
         self.checker = checkers.HTMLChecker(self.application)
 
