@@ -26,5 +26,6 @@
     "unused": true,
     "strict": true,
     "maxlen": 120,
-    "laxcomma": false
+    "laxcomma": false,
+    "esversion": 6
 }
