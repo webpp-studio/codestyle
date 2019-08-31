@@ -1,10 +1,10 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
 RUN set -x && \
     export DEBIAN_FRONTEND=noninteractive && \
     sed -i 's|archive.ubuntu.com|mirror.yandex.ru|' /etc/apt/sources.list && \
-    apt-get update && \
-    apt-get install -yq --no-install-recommends \
+    apt update && \
+    apt install -yq --no-install-recommends \
         python3 python3-pip nodejs npm \
         npm php-pear python3-setuptools && \
     npm install -g jshint jscs jscs-fixer csscomb htmlcs walk brace-expansion && \
