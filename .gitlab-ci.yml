@@ -14,6 +14,7 @@ build-image:
   stage: build
   script:
     - docker build -t git.webpp.ru:4567/tools/codestyle:$CI_COMMIT_REF_NAME .
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - docker push git.webpp.ru:4567/tools/codestyle:$CI_COMMIT_REF_NAME
   only:
     - branches
@@ -24,6 +25,7 @@ build-image-latest:
   stage: build
   script:
     - docker build -t git.webpp.ru:4567/tools/codestyle:latest .
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - docker push git.webpp.ru:4567/tools/codestyle:latest
   only:
     - master
