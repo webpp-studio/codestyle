@@ -9,9 +9,7 @@ RUN set -x && \
         npm php-pear python3-setuptools && \
     npm install -g jshint jscs jscs-fixer csscomb htmlcs walk brace-expansion && \
     pear install PHP_CodeSniffer && \
-    ln -s /usr/bin/nodejs /usr/bin/node && \
     rm -rf /var/lib/apt/lists/*
-
 
 COPY . /tmp/codestyle
 
