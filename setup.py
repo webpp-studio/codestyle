@@ -21,11 +21,11 @@ setup(
     scripts=['scripts/codestyle'],
     install_requires=[
         'future',
-        'pep8>=1.5.7,<1.6',
-        'pyflakes>=0.8.1,<0.9',
-        'autopep8>=1.2,<=1.2.99',
-        'flake8>=3.2,<=3.2.99',
-        'autoflake>=0.6,<=0.6.99',
+        'pep8~=1.7.1',
+        'pyflakes~=2.1.1',
+        'autopep8~=1.4.4',
+        'flake8~=3.7.8',
+        'autoflake~=1.3.1',
     ],
     test_suite='tests',
     tests_require=[
