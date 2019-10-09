@@ -1,13 +1,13 @@
-FROM ubuntu:18.04
-
-RUN apt update -qq && \
-    export DEBIAN_FRONTEND=noninteractive && \
-    apt install -y -qq python3 python3.5 python3.6 python3-pip php-pear python-setuptools python3-setuptools nodejs npm && \
+FROM python:3.6
+COPY . /usr/src/app
+RUN \
+    cd /usr/src/app && \
     pip3 install tox && \
+    curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
+    apt-get -q update && \
+    apt-get -qy install --no-install-recommends python3.7 nodejs php-pear && \
     npm install -g jshint jscs jscs-fixer csscomb htmlcs walk brace-expansion && \
-    pear install PHP_CodeSniffer
-
-COPY . /app
-WORKDIR /app
-
-CMD tox
+    pear channel-update pear.php.net && \
+    pear install PHP_CodeSniffer && \
+    rm -rf /var/lib/apt/lists/*
+CMD ["tox"]
