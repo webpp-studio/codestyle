@@ -20,7 +20,7 @@ setup(
     long_description=open('README.rst').read(),
     scripts=['scripts/codestyle'],
     install_requires=[
-        'future',
+        'future~=0.17.1',
         'pep8~=1.7.1',
         'pyflakes~=2.1.1',
         'autopep8~=1.4.4',
@@ -29,8 +29,7 @@ setup(
     ],
     test_suite='tests',
     tests_require=[
-        'mock>=2.0,<=2.0.99',
-        'six>=1.9'
+        'mock~=3.0.5',
+        'six~=1.12.0'
     ]
 )
-

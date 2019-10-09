@@ -1,31 +1,35 @@
 stages:
-  - tests
   - build
+  - test
+  - deploy
 
-tests:
-  stage: tests
+update tests image:
+  stage: build
+  image: gcr.io/kaniko-project/executor:debug
   script:
-    - docker build -f tests/Dockerfile -t codestyle/tests .
-    - docker run --rm codestyle/tests
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --cache=true --context $CI_PROJECT_DIR/tests --dockerfile $CI_PROJECT_DIR/tests/Dockerfile --destination $CI_REGISTRY_IMAGE/tests
   only:
     - branches
 
-build-image:
-  stage: build
-  script:
-    - docker build -t git.webpp.ru:4567/tools/codestyle:$CI_COMMIT_REF_NAME .
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - docker push git.webpp.ru:4567/tools/codestyle:$CI_COMMIT_REF_NAME
+run unit tests:
+  stage: test
+  image: $CI_REGISTRY_IMAGE/tests
+  script: tox
   only:
     - branches
-  except:
-    - master
 
-build-image-latest:
-  stage: build
+check guidelines:
+  stage: test
+  image: $CI_REGISTRY_IMAGE:latest
+  script: codestyle ./ --quiet --exclude './tests/data'
+  only:
+    - branches
+
+update latest image:
+  stage: deploy
   script:
-    - docker build -t git.webpp.ru:4567/tools/codestyle:latest .
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - docker push git.webpp.ru:4567/tools/codestyle:latest
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --cache=true --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:latest
   only:
     - master
