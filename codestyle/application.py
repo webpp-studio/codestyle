@@ -38,44 +38,68 @@ class Application(object):
             standard=self.settings.DEFAULT_STANDARD_DIR)
         self.checkers = None
         self.excludes = '$.'
-        self.argument_parser = self._process_argument_parser()
-        self.config_parser = self._process_config_parser()
+        self.argument_parser = argparse.ArgumentParser(
+            description=str(self.__doc__))
+        self.config_parser = ConfigParser()
 
-    def _process_argument_parser(self) -> argparse.ArgumentParser:
-        argument_parser = argparse.ArgumentParser(
-            description=str(self.__doc__)
-        )
-        argument_parser.add_argument(
+        self._add_arguments()
+        self.parse_cmd_args(self._get_config_parser_cmd_arguments())
+        self.parse_cmd_args()
+
+    def _add_arguments(self) -> None:
+        self.argument_parser.add_argument(
             'target', metavar='target', type=str, nargs='+',
             help='files for a checking'
         )
-        argument_parser.add_argument(
+        self.argument_parser.add_argument(
             '-i', '--fix', dest='fix', action='store_true',
             help='auto fix codestyle errors if possible', default=False
         )
-        argument_parser.add_argument(
+        self.argument_parser.add_argument(
             '-c', '--compact', dest='compact', action='store_true',
             help='Show a compact output', default=False
         )
-        argument_parser.add_argument(
+        self.argument_parser.add_argument(
             '-l', '--language', dest='language', type=str,
             help='force set the language for a checking',
             metavar='language name', default=None
         )
-        argument_parser.add_argument(
+        self.argument_parser.add_argument(
             '-x', '--exclude', dest='exclude', type=str,
             help='Exclude paths/files from checking', metavar='glob pattern',
             nargs='+', default=tuple()
         )
-        argument_parser.add_argument(
+        self.argument_parser.add_argument(
             '-q', '--quiet', dest='quiet', action='store_true', default=False,
             help='Quiets "Processing" message and warnings'
         )
-        return argument_parser
 
-    def _process_config_parser(self) -> ConfigParser:
-        config_parser = ConfigParser()
-        return config_parser
+    @staticmethod
+    def _argument_parser_bool_arguments() -> tuple:
+        return 'fix', 'compact', 'quiet'
+
+    def _get_config_parser_cmd_arguments(self) -> list:
+        """Parse project's .ini file with arguments and return it"""
+        cmd_arguments = []
+        if self.settings.PROJECT_INITIALIZATION_PATH.is_file():
+            self.config_parser.read(
+                str(self.settings.PROJECT_INITIALIZATION_PATH))
+        if 'parameters' not in self.config_parser:
+            return []
+        parameters = self.config_parser['parameters']
+        for parameter_name in parameters:
+            if not parameters[parameter_name]:
+                continue
+            parameter = f'--{parameter_name}'
+            parameter_value = parameters[parameter_name].strip()
+            if parameter_name in Application._argument_parser_bool_arguments():
+                cmd_argument = []
+                if parameter_value == 'True':
+                    cmd_argument.append(parameter)
+            else:
+                cmd_argument = [parameter_value] + parameter_value.split(' ')
+            cmd_arguments += cmd_argument
+        return cmd_arguments
 
     def create_checkers(self):
         """
