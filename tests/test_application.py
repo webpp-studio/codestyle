@@ -72,7 +72,8 @@ class TestApplication(unittest.TestCase):
         parameters_namespace = self.application.parse_cmd_args([
             'test1.js', 'test2.html'
         ])
-        self.assertEqual(parameters_namespace.target, ['test1.js', 'test2.html'])
+        self.assertEqual(parameters_namespace.target,
+                         ['test1.js', 'test2.html'])
 
         parameters_namespace = self.application.parse_cmd_args(
             ['-i', 'test.js'])

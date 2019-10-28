@@ -133,7 +133,8 @@ class Application(object):
 
         checkers_ = self.get_checkers()
         if self.parameters_namespace.language is not None:  # forced language
-            return checkers_.get('.%s' % self.parameters_namespace.language, None)
+            return checkers_.get(
+                f'.{self.parameters_namespace.language}', None)
         return checkers_.get(ext, None)
 
     def get_config_path(self, filename):
@@ -276,8 +277,10 @@ class Application(object):
 
         self.parameters_namespace = self.parse_cmd_args()
         self.check_force_language(self.parameters_namespace.language)
-        self.excludes = r'|'.join(
-            [fnmatch.translate(x) for x in self.parameters_namespace.exclude]) or r'$.'
+        excludes = []
+        for exclude in self.parameters_namespace.exclude:
+            excludes.append(fnmatch.translate(exclude))
+        self.excludes = r'|'.join(excludes) or r'$.'
 
         self.log("Checking external dependencies....")
 
