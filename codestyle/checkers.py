@@ -64,7 +64,7 @@ class BaseChecker(with_metaclass(ABCMeta, object)):
             files = [files]
         command_args = list(command) + list(files)
         kwargs = {'stderr': STDOUT}
-        if self.application.params.compact:
+        if self.application.parameters_namespace.compact:
             kwargs['stdout'] = DEVNULL
         p = subprocess.Popen(command_args, **kwargs)
         output = p.communicate()[0]

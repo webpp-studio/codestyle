@@ -33,7 +33,7 @@ class Application(object):
 
     def __init__(self):
         self.settings = settings
-        self.params = None
+        self.parameters_namespace = argparse.Namespace()
         self.checkers = None
         self.excludes = '$.'
 
@@ -68,8 +68,8 @@ class Application(object):
         """
 
         checkers_ = self.get_checkers()
-        if self.params.language is not None:  # forced language
-            return checkers_.get('.%s' % self.params.language, None)
+        if self.parameters_namespace.language is not None:  # forced language
+            return checkers_.get('.%s' % self.parameters_namespace.language, None)
         return checkers_.get(ext, None)
 
     def get_config_path(self, filename):
@@ -136,7 +136,7 @@ class Application(object):
         Get a path of a coding standard directory
         """
 
-        return self.params.standard
+        return self.parameters_namespace.standard
 
     def log(self, string, newline=True, buf=sys.stdout):
         """
@@ -171,17 +171,17 @@ class Application(object):
         if checker is None:
             return None
 
-        if self.params.compact:
+        if self.parameters_namespace.compact:
             self.log("Processing: " + path + "...", False)
-        elif not self.params.quiet:
+        elif not self.parameters_namespace.quiet:
             self.log("Processing: " + path + "...")
 
         result = None
 
-        if self.params.fix:
+        if self.parameters_namespace.fix:
             try:
                 result = checker.fix(path)
-                if self.params.compact:
+                if self.parameters_namespace.compact:
                     if result.is_success():
                         self.log("Some errors has been fixed\n")
                     else:
@@ -192,13 +192,13 @@ class Application(object):
                 )
         else:
             result = checker.check(path)
-            if self.params.compact:
+            if self.parameters_namespace.compact:
                 if result.is_success():
                     self.log(" Done")
                 else:
                     self.log(" Fail")
             else:
-                if result.output and not self.params.quiet:
+                if result.output and not self.parameters_namespace.quiet:
                     self.log("\n")
 
         return result
@@ -237,10 +237,10 @@ class Application(object):
         Run a code checking
         """
 
-        self.params = self.parse_cmd_args()
-        self.check_force_language(self.params.language)
+        self.parameters_namespace = self.parse_cmd_args()
+        self.check_force_language(self.parameters_namespace.language)
         self.excludes = r'|'.join(
-            [fnmatch.translate(x) for x in self.params.exclude]) or r'$.'
+            [fnmatch.translate(x) for x in self.parameters_namespace.exclude]) or r'$.'
 
         self.log("Checking external dependencies....")
 
@@ -253,7 +253,7 @@ class Application(object):
         total_success = 0
         total_failed = 0
 
-        for path in self.params.target:
+        for path in self.parameters_namespace.target:
             for result in self.process_path(path):
                 if result is None:
                     continue
