@@ -85,4 +85,4 @@ Usage from the docker container
 -------------------------------
 
 Bad practices:
-- Use --user $(id -u):$(id -g) parameter with docker run
+    - Use --user $(id -u):$(id -g) parameter with docker run
