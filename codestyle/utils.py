@@ -1,8 +1,6 @@
 """Codestyle checker utils"""
-
 import os
-import subprocess
-from subprocess import PIPE
+from subprocess import Popen, PIPE
 
 
 class DependencyError(BaseException):
@@ -48,13 +46,11 @@ def check_external_deps():
     nodejs_libs = ['jscs-fixer', 'walk', 'brace-expansion']
 
     for nodejs_lib in nodejs_libs:
-        proc = subprocess.Popen(
-            'npm view %s version' % nodejs_lib, shell=True,
-            stdout=PIPE, stderr=PIPE
-        )
-        proc.communicate()
-        if proc.returncode != 0:
-            raise DependencyError(
-                '%s is not installed\nRun npm -g install %s'
-                % (nodejs_lib, nodejs_lib)
-            )
+        npm_process = Popen(['npm', 'view', nodejs_lib, 'version'],
+                            stdout=PIPE, stderr=PIPE)
+        npm_output, npm_error = npm_process.communicate()
+        if npm_error:
+            message = f'{nodejs_lib} is not installed\n'
+            message += f'Run npm -g install {nodejs_lib}\n'
+            message += f'npm errror: {npm_error}'
+            raise DependencyError(message)
