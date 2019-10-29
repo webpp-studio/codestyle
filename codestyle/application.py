@@ -43,8 +43,6 @@ class Application(object):
         self.config_parser = ConfigParser()
 
         self._add_arguments()
-        self.parse_cmd_args(self._get_config_parser_cmd_arguments())
-        self.parse_cmd_args()
 
     def _add_arguments(self) -> None:
         self.argument_parser.add_argument(
@@ -274,8 +272,8 @@ class Application(object):
         """
         Run a code checking
         """
-
-        self.parameters_namespace = self.parse_cmd_args()
+        self.parse_cmd_args(self._get_config_parser_cmd_arguments())
+        self.parse_cmd_args()
         self.check_force_language(self.parameters_namespace.language)
         excludes = []
         for exclude in self.parameters_namespace.exclude:
