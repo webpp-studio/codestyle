@@ -135,7 +135,7 @@ class Application(object):
         """
 
         checkers_data = self.get_checkers()
-        if not self.parameters_namespace.language:  # forced language
+        if self.parameters_namespace.language:  # forced language
             return checkers_data.get(
                 f'.{self.parameters_namespace.language}', None)
         return checkers_data.get(extension, None)
