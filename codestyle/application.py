@@ -45,6 +45,7 @@ class Application(object):
         self._add_arguments()
 
     def _add_arguments(self) -> None:
+        """Method for declare ArgumentParser's arguments"""
         self.argument_parser.add_argument(
             'target', metavar='target', type=str, nargs='+',
             help='files for a checking'
@@ -74,6 +75,10 @@ class Application(object):
 
     @staticmethod
     def _argument_parser_bool_arguments() -> tuple:
+        """
+        Return tuple of bool-type arguments listed in _add_arguments()
+
+        """
         return 'fix', 'compact', 'quiet'
 
     def _get_config_parser_cmd_arguments(self) -> list:
