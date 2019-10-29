@@ -124,16 +124,16 @@ class Application(object):
             self.create_checkers()
         return self.checkers
 
-    def get_checker(self, ext):
+    def get_checker(self, extension):
         """
         Get checker instance by extension
         """
 
-        checkers_ = self.get_checkers()
-        if self.parameters_namespace.language is not None:  # forced language
-            return checkers_.get(
+        checkers_data = self.get_checkers()
+        if not self.parameters_namespace.language:  # forced language
+            return checkers_data.get(
                 f'.{self.parameters_namespace.language}', None)
-        return checkers_.get(ext, None)
+        return checkers_data.get(extension, None)
 
     def get_config_path(self, filename):
         """
