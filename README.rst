@@ -1,9 +1,6 @@
 Codestyle checker
 =================
 
-.. image:: https://travis-ci.org/webpp-studio/codestyle.svg?branch=master
-    :target: https://travis-ci.org/webpp-studio/codestyle
-
 This script checks and auto fixes codestyle for all supported languages:
 
 1. PHP (phpcs)
@@ -87,5 +84,5 @@ Dependencies
 Usage from the docker container
 -------------------------------
 
-Also you can use `the docker container <https://hub.docker.com/r/webpp/codestyle>`_
-with all installed dependencies.
+Bad practices:
+    - Use --user $(id -u):$(id -g) parameter with docker run
