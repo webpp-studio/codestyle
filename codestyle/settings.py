@@ -11,7 +11,7 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 # Default configuration file path
 DEFAULT_CONFIG_FILE = os.path.join(BASE_DIR, 'defaults.cfg')
 
-PROJECT_INITIALIZATION_PATH = Path.cwd() / 'codestyle.ini'
+PROJECT_INITIALIZATION_PATH = Path.cwd() / '.codestyle.ini'
 
 # Custom user configuration file path
 USER_CONFIG_FILE = os.path.expanduser('~/.config/codestyle.cfg')
