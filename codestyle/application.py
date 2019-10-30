@@ -13,6 +13,7 @@ import fnmatch
 import re
 from configparser import ConfigParser
 
+from codestyle.settings import PROJECT_INITIALIZATION_PATH
 from .utils import check_external_deps, DependencyError
 from . import checkers
 from . import settings
@@ -40,6 +41,7 @@ class Application(object):
         self.excludes = '$.'
         self.argument_parser = argparse.ArgumentParser(
             description=str(self.__doc__))
+        self.boolean_arguments = None
         self.config_parser = ConfigParser()
 
         self._add_arguments()
@@ -48,6 +50,7 @@ class Application(object):
         """
         Method for declare ArgumentParser's arguments
         """
+        self.boolean_arguments = 'fix', 'compact', 'quiet'
         self.argument_parser.add_argument(
             'target', metavar='target', type=str, nargs='+',
             help='files for a checking'
@@ -75,38 +78,47 @@ class Application(object):
             help='Quiets "Processing" message and warnings'
         )
 
-    @staticmethod
-    def _argument_parser_bool_arguments() -> tuple:
+    def _build_config_parser_cli_arguments(self) -> list:
         """
-        Return tuple of bool-type arguments listed in _add_arguments()
+        Iterate ConfigParser's parameters and return them in list view
+        as CLI arguments.
         """
-        return 'fix', 'compact', 'quiet'
+        cli_arguments = []
+        parameters = self.get_config_parser_parameters()
+        for parameter_name in parameters.keys():
+            if parameter_name in self.boolean_arguments:
+                cli_argument = []
+                if parameters[parameter_name] == 'true':
+                    cli_argument.extend(f'--{parameter_name}')
+            else:
+                parameter_value = parameters[parameter_name]
+                cli_argument = [parameter_value] + parameter_value.split(' ')
+            cli_arguments.extend(cli_argument)
+        return cli_arguments
 
-    def _get_config_parser_cmd_arguments(self) -> list:
+    def _build_parameters_data(self) -> dict:
         """
-        Parse project's .ini file with arguments and return it
+        Extract ConfigParser's non empty parameters
         """
-        cmd_arguments = []
-        if self.settings.PROJECT_INITIALIZATION_PATH.is_file():
-            self.config_parser.read(
-                str(self.settings.PROJECT_INITIALIZATION_PATH))
-        if 'parameters' not in self.config_parser:
-            return []
+        parameters_data = {}
         parameters = self.config_parser['parameters']
         for parameter_name in parameters:
             if not parameters[parameter_name]:
                 continue
-            parameter = f'--{parameter_name.lower()}'
-            parameter_value = parameters[parameter_name].strip()
-            bool_arguments = Application._argument_parser_bool_arguments()
-            if parameter_name.lower() in bool_arguments:
-                cmd_argument = []
-                if parameter_value.lower() == 'True':
-                    cmd_argument.append(parameter)
-            else:
-                cmd_argument = [parameter_value] + parameter_value.split(' ')
-            cmd_arguments += cmd_argument
-        return cmd_arguments
+            parameters_data.update({
+                parameter_name.lower(): parameters[parameter_name].strip()
+            })
+        return parameters_data
+
+    def get_config_parser_parameters(self) -> dict:
+        """
+        Read project's initialization file and return parameters
+        """
+        if self.settings.PROJECT_INITIALIZATION_PATH.is_file():
+            self.config_parser.read(PROJECT_INITIALIZATION_PATH)
+        if 'parameters' not in self.config_parser:
+            return {}
+        return self._build_parameters_data()
 
     def create_checkers(self):
         """
@@ -269,7 +281,7 @@ class Application(object):
         """
         Run a code checking
         """
-        self.parse_cmd_args(self._get_config_parser_cmd_arguments())
+        self.parse_cmd_args(self._build_config_parser_cli_arguments())
         self.parse_cmd_args()
         self.check_force_language(self.parameters_namespace.language)
         excludes = []
