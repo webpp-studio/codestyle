@@ -18,7 +18,6 @@ class TestApplication(unittest.TestCase):
         """
         Setup initial data
         """
-
         self.application = application.Application()
         self.application.parameters_namespace = argparse.Namespace(
             language=None,

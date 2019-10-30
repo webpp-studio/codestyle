@@ -18,7 +18,6 @@ class BaseResult(with_metaclass(ABCMeta, object)):
         """
         Check result is success
         """
-
         return False
 
     @abstractproperty
@@ -26,7 +25,6 @@ class BaseResult(with_metaclass(ABCMeta, object)):
         """
         Get result output (stdout and stderr)
         """
-
         return ""
 
     def __bool__(self):
@@ -53,7 +51,6 @@ class Result(BaseResult):
         """
         Check result is success
         """
-
         return self._is_success
 
 
@@ -69,7 +66,6 @@ class ResultSet(BaseResult):
         """
         Add checking result
         """
-
         self.results.append(result)
 
     @property
@@ -77,7 +73,6 @@ class ResultSet(BaseResult):
         """
         Get output of all checking results
         """
-
         output = ""
         for result in self.results:
             output += result.output
@@ -89,7 +84,6 @@ class ResultSet(BaseResult):
         """
         Check for all checking results are success
         """
-
         if len(self.results) == 0:
             return False
         is_success = True

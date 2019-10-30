@@ -45,7 +45,9 @@ class Application(object):
         self._add_arguments()
 
     def _add_arguments(self) -> None:
-        """Method for declare ArgumentParser's arguments"""
+        """
+        Method for declare ArgumentParser's arguments
+        """
         self.argument_parser.add_argument(
             'target', metavar='target', type=str, nargs='+',
             help='files for a checking'
@@ -77,12 +79,13 @@ class Application(object):
     def _argument_parser_bool_arguments() -> tuple:
         """
         Return tuple of bool-type arguments listed in _add_arguments()
-
         """
         return 'fix', 'compact', 'quiet'
 
     def _get_config_parser_cmd_arguments(self) -> list:
-        """Parse project's .ini file with arguments and return it"""
+        """
+        Parse project's .ini file with arguments and return it
+        """
         cmd_arguments = []
         if self.settings.PROJECT_INITIALIZATION_PATH.is_file():
             self.config_parser.read(
@@ -108,7 +111,6 @@ class Application(object):
         """
         Create checker instances for extensions
         """
-
         self.checkers = {}
         for ext, checker_class in self.CHECKERS:
             if not issubclass(checker_class, checkers.BaseChecker):
@@ -124,7 +126,6 @@ class Application(object):
         """
         Get all checker instances for extensions
         """
-
         if self.checkers is None:
             self.create_checkers()
         return self.checkers
@@ -133,7 +134,6 @@ class Application(object):
         """
         Get checker instance by extension
         """
-
         checkers_data = self.get_checkers()
         if self.parameters_namespace.language:  # forced language
             return checkers_data.get(
@@ -144,7 +144,6 @@ class Application(object):
         """
         Get path of the config file by name
         """
-
         return os.path.join(self.get_standard_dir(), filename)
 
     def parse_cmd_args(self, args=None):
@@ -158,7 +157,6 @@ class Application(object):
         """
         Check for selected language
         """
-
         if language is None:
             return
         checker_map = self.get_checkers()
@@ -176,14 +174,12 @@ class Application(object):
         """
         Get a path of a coding standard directory
         """
-
         return self.parameters_namespace.standard
 
     def log(self, string, newline=True, buf=sys.stdout):
         """
         Log a message to the STDOUT
         """
-
         if newline:
             string += '\n'
         buf.write(string)
@@ -192,14 +188,12 @@ class Application(object):
         """
         Log an error message to the STDERR
         """
-
         self.log(string, newline, sys.stderr)
 
     def exit_with_error(self, message, retcode=1):
         """
         Put an error message to the STDERR and exit
         """
-
         self.log_error("%s: %s" % (sys.argv[0], message))
         sys.exit(retcode)
 
@@ -207,7 +201,6 @@ class Application(object):
         """
         Process a file (to check or pass it)
         """
-
         checker = self.get_checker(os.path.splitext(path)[1])
         if checker is None:
             return None
@@ -248,7 +241,6 @@ class Application(object):
         """
         Check code in directory (recursive)
         """
-
         for root, dirs, files in os.walk(path):
             # Exclude dirs
             dirs[:] = [d for d in dirs if not re.match(
@@ -263,7 +255,6 @@ class Application(object):
         """
         Check file or directory (recursive)
         """
-
         if not os.path.exists(path):
             self.exit_with_error("No such file or directory: " + path)
         elif os.path.isfile(path):
