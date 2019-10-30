@@ -96,11 +96,12 @@ class Application(object):
         for parameter_name in parameters:
             if not parameters[parameter_name]:
                 continue
-            parameter = f'--{parameter_name}'
+            parameter = f'--{parameter_name.lower()}'
             parameter_value = parameters[parameter_name].strip()
-            if parameter_name in Application._argument_parser_bool_arguments():
+            bool_arguments = Application._argument_parser_bool_arguments()
+            if parameter_name.lower() in bool_arguments:
                 cmd_argument = []
-                if parameter_value == 'True':
+                if parameter_value.lower() == 'True':
                     cmd_argument.append(parameter)
             else:
                 cmd_argument = [parameter_value] + parameter_value.split(' ')
