@@ -13,7 +13,8 @@ import fnmatch
 import re
 from configparser import ConfigParser
 
-from codestyle.settings import PROJECT_INITIALIZATION_PATH, DEFAULT_STANDARD_DIR
+from codestyle.settings import PROJECT_INITIALIZATION_PATH, \
+    DEFAULT_STANDARD_DIR
 from .utils import check_external_deps, DependencyError
 from . import checkers
 from . import settings
