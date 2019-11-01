@@ -13,7 +13,8 @@ import fnmatch
 import re
 from configparser import ConfigParser
 
-from codestyle.settings import PROJECT_INITIALIZATION_PATH
+from codestyle.settings import PROJECT_INITIALIZATION_PATH, \
+    DEFAULT_STANDARD_DIR
 from .utils import check_external_deps, DependencyError
 from . import checkers
 from . import settings
@@ -62,6 +63,11 @@ class Application(object):
         self.argument_parser.add_argument(
             '-c', '--compact', dest='compact', action='store_true',
             help='Show a compact output', default=False
+        )
+        self.argument_parser.add_argument(
+            '-s', '--standard', dest='standard', type=str,
+            help='A path to a coding standard directory',
+            default=DEFAULT_STANDARD_DIR, metavar='standard-dir'
         )
         self.argument_parser.add_argument(
             '-l', '--language', dest='language', type=str,
