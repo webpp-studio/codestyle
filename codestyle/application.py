@@ -102,9 +102,7 @@ class Application(object):
         """
         parameters_data = {}
         parameters = self.config_parser['parameters']
-        for parameter_name in parameters:
-            if not parameters[parameter_name]:
-                continue
+        for parameter_name in filter(None, self.config_parser['parameters']):
             parameters_data.update({
                 parameter_name.lower(): parameters[parameter_name].strip()
             })
