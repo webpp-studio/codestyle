@@ -85,6 +85,8 @@ class Application(object):
         """
         cli_arguments = []
         parameters = self.get_config_parser_parameters()
+        target_arguments = parameters.pop(
+            'target', str(PROJECT_INITIALIZATION_PATH.parent)).split(' ')
         for parameter_name in parameters.keys():
             if parameter_name in self.boolean_arguments:
                 cli_argument = []
@@ -94,6 +96,7 @@ class Application(object):
                 parameter_value = parameters[parameter_name]
                 cli_argument = [parameter_value] + parameter_value.split(' ')
             cli_arguments.extend(cli_argument)
+        cli_arguments.extend(target_arguments)
         return cli_arguments
 
     def _build_parameters_data(self) -> dict:

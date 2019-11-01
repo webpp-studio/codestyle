@@ -35,7 +35,7 @@ Usage
   Check and fix a code style
 
   positional arguments:
-    target                files for a checking
+    target                files for a checking (project path if empty)
 
   optional arguments:
     -h, --help            show this help message and exit
