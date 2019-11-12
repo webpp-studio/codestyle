@@ -37,13 +37,13 @@ def check_external_deps():
     Check external dependencies
     """
 
-    binaries = ['npm', 'jscs', 'jshint', 'phpcs', 'phpcbf',
+    binaries = ['npm', 'eslint', 'phpcs', 'phpcbf',
                 'csscomb', 'htmlcs']
     for binary in binaries:
         if not which(binary):
             raise DependencyError('%s is not installed' % binary)
 
-    nodejs_libs = ['jscs-fixer', 'walk', 'brace-expansion']
+    nodejs_libs = ['walk', 'brace-expansion']
 
     for nodejs_lib in nodejs_libs:
         npm_process = Popen(['npm', 'view', nodejs_lib, 'version'],

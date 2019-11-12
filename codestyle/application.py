@@ -26,6 +26,7 @@ class Application(object):
     CHECKERS = (
         ('.php', checkers.PHPChecker),
         ('.js', checkers.JSChecker),
+        ('.vue', checkers.JSChecker),
         ('.py', checkers.PythonChecker),
         (('.css', '.less'), checkers.LessChecker),
         ('.html', checkers.HTMLChecker),
