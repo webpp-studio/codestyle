@@ -53,7 +53,9 @@ Usage with docker
 
 ::
 
+  # building image
   docker build -t <image_name> .
+  # run container
   docker run --rm --volume=`pwd`:/code --workdir=/code --tty <image_name> <path>
 
 
