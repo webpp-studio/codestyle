@@ -25,8 +25,7 @@ class Application(object):
     # Checker classmap
     CHECKERS = (
         ('.php', checkers.PHPChecker),
-        ('.js', checkers.JSChecker),
-        ('.vue', checkers.JSChecker),
+        (('.js', '.vue'), checkers.JSChecker),
         ('.py', checkers.PythonChecker),
         (('.css', '.less'), checkers.LessChecker),
         ('.html', checkers.HTMLChecker),
