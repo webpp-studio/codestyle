@@ -5,7 +5,7 @@ This script checks and auto fixes codestyle for all supported languages:
 
 1. PHP (phpcs)
 2. Python (flake8)
-3. Javascript (jscs and jshint)
+3. Javascript (eslint)
 4. CSS (csscomb)
 5. HTML (htmlcs)
 
@@ -48,6 +48,15 @@ Usage
     -x glob pattern [glob pattern ...], --exclude glob pattern [glob pattern ...]
                           Exclude paths/files from checking
 
+Usage with docker
+-----------------
+
+::
+
+  docker build -t <image_name> .
+  docker run --rm --volume=`pwd`:/code --workdir=/code --tty <image_name> <path>
+
+
 
 Example
 -------
@@ -67,19 +76,19 @@ Example
     # check all project and save full report to file
     codestyle /path/to/project &> report.txt
 
+
+
 Dependencies
 ------------
 
 1. phpcs
 2. phpcbf
-3. jshint (NodeJS)
-4. jscs-fixer (NodeJS)
-5. jscs (NodeJS)
-6. flake8
-7. csscomb (NodeJS)
-8. htmlcs >= 0.1.4 (NodeJS)
-9. walk (NodeJS)
-10. brace-expansion (NodeJS)
+3. eslint (NodeJS)
+4. flake8
+5. csscomb (NodeJS)
+6. htmlcs >= 0.1.4 (NodeJS)
+7. walk (NodeJS)
+8. brace-expansion (NodeJS)
 
 Usage from the docker container
 -------------------------------
