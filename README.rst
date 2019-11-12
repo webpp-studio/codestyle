@@ -56,7 +56,9 @@ Usage with docker
   # building image
   docker build -t <image_name> .
   # run container
-  docker run --rm --volume=`pwd`:/code --workdir=/code --tty <image_name> <path>
+  docker run --rm --volume=`pwd`:/code --workdir=/code --tty <image_name> [-h] [-I] [-i] [-c] [-s standard-dir] [-l language name]
+                                                                          [-e glob pattern [glob pattern ...]]
+                                                                          target [target ...]
 
 
 
