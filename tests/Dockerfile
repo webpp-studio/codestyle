@@ -6,7 +6,7 @@ RUN \
     curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
     apt-get -q update && \
     apt-get -qy install --no-install-recommends python3.7 nodejs php-pear && \
-    npm install -g jshint jscs jscs-fixer csscomb htmlcs walk brace-expansion && \
+    npm install -g csscomb htmlcs walk brace-expansion eslint && \
     pear channel-update pear.php.net && \
     pear install PHP_CodeSniffer && \
     rm -rf /var/lib/apt/lists/*

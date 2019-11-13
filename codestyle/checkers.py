@@ -99,13 +99,12 @@ class JSChecker(BaseChecker):
 
     def get_check_commands(self):
         return (
-            (self.exe('jscs'), '--config', self.cfg('jscs')),
-            (self.exe('jshint'), '--config', self.cfg('jshint')),
+            (self.exe('eslint'), '--config', self.cfg('eslint')),
         )
 
     def get_fix_commands(self):
         return (
-            (self.exe('jscs'), '--fix', '--config', self.cfg('jscs')),
+            (self.exe('eslint'), '--fix', '--config', self.cfg('eslint')),
         )
 
 
