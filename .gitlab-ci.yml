@@ -1,20 +1,26 @@
+variables:
+  KUBERNETES_PULL_POLICY: always
+
 stages:
   - build
   - test
+  - analyze
   - deploy
+
 
 update tests image:
   stage: build
   image: gcr.io/kaniko-project/executor:debug
   script:
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --cache=true --context $CI_PROJECT_DIR/tests --dockerfile $CI_PROJECT_DIR/tests/Dockerfile --destination $CI_REGISTRY_IMAGE/tests
+    - /kaniko/executor --cache=true --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/tests/Dockerfile --destination $CI_REGISTRY_IMAGE/tests:$CI_COMMIT_REF_SLUG
   only:
     - branches
 
+
 run unit tests:
   stage: test
-  image: $CI_REGISTRY_IMAGE/tests
+  image: $CI_REGISTRY_IMAGE/tests:$CI_COMMIT_REF_SLUG
   script: tox
   only:
     - branches
@@ -26,11 +32,28 @@ check guidelines:
   only:
     - branches
 
-update latest image:
+
+sonar:
+  stage: analyze
+  image: git.webpp.ru:4567/tools/sonar-cube-scanner:latest
+  variables:
+    SONAR_PROJECT_KEY: codestyle
+    SONAR_USER: $SONAR_USER
+    SONAR_PROJECT_VERSION: $CI_COMMIT_REF_NAME/$CI_PIPELINE_ID
+  script: /usr/bin/sonar-scanner-run.sh
+  only:
+    - branches
+
+
+update release image:
   stage: deploy
   image: gcr.io/kaniko-project/executor:debug
   script:
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --cache=true --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
     - /kaniko/executor --cache=true --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:latest
   only:
-    - master
+    - /^release/\d+(\.\d+)*$/
+    - /^hotfix/\d+(\.\d+)*$/
+  except:
+    - branches
