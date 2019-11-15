@@ -29,28 +29,24 @@ class BaseChecker(with_metaclass(ABCMeta, object)):
         """
         List of check commands
         """
-
         return []
 
     def get_fix_commands(self):
         """
         List of fix commands
         """
-
         raise NotImplementedError('')
 
     def exe(self, alias):
         """
         Get checker executable name
         """
-
         return self.application.settings.CHECKER_EXE[alias]
 
     def cfg(self, checker):
         """
         Get checker config path
         """
-
         return self.application.get_config_path(
             self.application.settings.CHECKER_CFG[checker]
         )
@@ -59,12 +55,11 @@ class BaseChecker(with_metaclass(ABCMeta, object)):
         """
         Make checking result from command
         """
-
         if not isinstance(files, (list, tuple)):
             files = [files]
         command_args = list(command) + list(files)
         kwargs = {'stderr': STDOUT}
-        if self.application.params.compact:
+        if self.application.parameters_namespace.compact:
             kwargs['stdout'] = DEVNULL
         p = subprocess.Popen(command_args, **kwargs)
         output = p.communicate()[0]
@@ -74,7 +69,6 @@ class BaseChecker(with_metaclass(ABCMeta, object)):
         """
         Check files
         """
-
         results = ResultSet()
         for command in self.get_check_commands():
             result = self.make_result(command, files)
@@ -85,7 +79,6 @@ class BaseChecker(with_metaclass(ABCMeta, object)):
         """
         Fix files
         """
-
         results = ResultSet()
         for command in self.get_fix_commands():
             results.add(self.make_result(command, files))

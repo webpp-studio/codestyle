@@ -11,7 +11,10 @@ import sys
 import argparse
 import fnmatch
 import re
+from configparser import ConfigParser
 
+from codestyle.settings import PROJECT_INITIALIZATION_PATH, \
+    DEFAULT_STANDARD_DIR
 from .utils import check_external_deps, DependencyError
 from . import checkers
 from . import settings
@@ -33,15 +36,101 @@ class Application(object):
 
     def __init__(self):
         self.settings = settings
-        self.params = None
+        self.parameters_namespace = argparse.Namespace(
+            standard=self.settings.DEFAULT_STANDARD_DIR)
         self.checkers = None
         self.excludes = '$.'
+        self.argument_parser = argparse.ArgumentParser(
+            description=str(self.__doc__))
+        self.boolean_arguments = None
+        self.config_parser = ConfigParser()
+
+        self._add_arguments()
+
+    def _add_arguments(self) -> None:
+        """
+        Method for declare ArgumentParser's arguments
+        """
+        self.boolean_arguments = 'fix', 'compact', 'quiet'
+        self.argument_parser.add_argument(
+            'target', metavar='target', type=str, nargs='+',
+            help='files for a checking'
+        )
+        self.argument_parser.add_argument(
+            '-i', '--fix', dest='fix', action='store_true',
+            help='auto fix codestyle errors if possible', default=False
+        )
+        self.argument_parser.add_argument(
+            '-c', '--compact', dest='compact', action='store_true',
+            help='Show a compact output', default=False
+        )
+        self.argument_parser.add_argument(
+            '-s', '--standard', dest='standard', type=str,
+            help='A path to a coding standard directory',
+            default=DEFAULT_STANDARD_DIR, metavar='standard-dir'
+        )
+        self.argument_parser.add_argument(
+            '-l', '--language', dest='language', type=str,
+            help='force set the language for a checking',
+            metavar='language name', default=None
+        )
+        self.argument_parser.add_argument(
+            '-x', '--exclude', dest='exclude', type=str,
+            help='Exclude paths/files from checking', metavar='glob pattern',
+            nargs='+', default=tuple()
+        )
+        self.argument_parser.add_argument(
+            '-q', '--quiet', dest='quiet', action='store_true', default=False,
+            help='Quiets "Processing" message and warnings'
+        )
+
+    def _build_config_parser_cli_arguments(self) -> list:
+        """
+        Iterate ConfigParser's parameters and return them in list view
+        as CLI arguments.
+        """
+        cli_arguments = []
+        parameters = self.get_config_parser_parameters()
+        target_arguments = parameters.pop(
+            'target', str(PROJECT_INITIALIZATION_PATH.parent)).split(' ')
+        for parameter_name in parameters.keys():
+            if parameter_name in self.boolean_arguments:
+                cli_argument = []
+                if parameters[parameter_name] == 'true':
+                    cli_argument.extend(f'--{parameter_name}')
+            else:
+                parameter_value = parameters[parameter_name]
+                cli_argument = [parameter_value] + parameter_value.split(' ')
+            cli_arguments.extend(cli_argument)
+        cli_arguments.extend(target_arguments)
+        return cli_arguments
+
+    def _build_parameters_data(self) -> dict:
+        """
+        Extract ConfigParser's non empty parameters
+        """
+        parameters_data = {}
+        parameters = self.config_parser['parameters']
+        for parameter_name in filter(None, self.config_parser['parameters']):
+            parameters_data.update({
+                parameter_name.lower(): parameters[parameter_name].strip()
+            })
+        return parameters_data
+
+    def get_config_parser_parameters(self) -> dict:
+        """
+        Read project's initialization file and return parameters
+        """
+        if self.settings.PROJECT_INITIALIZATION_PATH.is_file():
+            self.config_parser.read(PROJECT_INITIALIZATION_PATH)
+        if 'parameters' not in self.config_parser:
+            return {}
+        return self._build_parameters_data()
 
     def create_checkers(self):
         """
         Create checker instances for extensions
         """
-
         self.checkers = {}
         for ext, checker_class in self.CHECKERS:
             if not issubclass(checker_class, checkers.BaseChecker):
@@ -57,67 +146,37 @@ class Application(object):
         """
         Get all checker instances for extensions
         """
-
         if self.checkers is None:
             self.create_checkers()
         return self.checkers
 
-    def get_checker(self, ext):
+    def get_checker(self, extension):
         """
         Get checker instance by extension
         """
-
-        checkers_ = self.get_checkers()
-        if self.params.language is not None:  # forced language
-            return checkers_.get('.%s' % self.params.language, None)
-        return checkers_.get(ext, None)
+        checkers_data = self.get_checkers()
+        if self.parameters_namespace.language:  # forced language
+            return checkers_data.get(
+                f'.{self.parameters_namespace.language}', None)
+        return checkers_data.get(extension, None)
 
     def get_config_path(self, filename):
         """
         Get path of the config file by name
         """
-
         return os.path.join(self.get_standard_dir(), filename)
 
     def parse_cmd_args(self, args=None):
         """
         Get parsed command line arguments
         """
-
-        parser = argparse.ArgumentParser(
-            description='Check and fix a code style')
-        parser.add_argument('target', metavar='target', type=str, nargs='+',
-                            help='files for a checking')
-        parser.add_argument(
-            '-i', '--fix',
-            dest='fix', action='store_true',
-            help='auto fix codestyle errors if possible',
-            default=False
-        )
-        parser.add_argument('-c', '--compact', dest='compact',
-                            action='store_true', help='Show a compact output',
-                            default=False)
-        parser.add_argument('-s', '--standard', dest='standard', type=str,
-                            help='A path to a coding standard directory',
-                            default=self.settings.DEFAULT_STANDARD_DIR,
-                            metavar='standard-dir')
-        parser.add_argument('-l', '--language', dest='language', type=str,
-                            help='force set the language for a checking',
-                            metavar='language name', default=None)
-        parser.add_argument('-x', '--exclude', dest='exclude', type=str,
-                            help='Exclude paths/files from checking',
-                            metavar='glob pattern', nargs='+',
-                            default=tuple())
-        parser.add_argument('-q', '--quiet', dest='quiet',
-                            action='store_true', default=False,
-                            help='Quiets "Processing" message and warnings')
-        return parser.parse_args(args)
+        return self.argument_parser.parse_args(
+            args, namespace=self.parameters_namespace)
 
     def check_force_language(self, language):
         """
         Check for selected language
         """
-
         if language is None:
             return
         checker_map = self.get_checkers()
@@ -135,14 +194,12 @@ class Application(object):
         """
         Get a path of a coding standard directory
         """
-
-        return self.params.standard
+        return self.parameters_namespace.standard
 
     def log(self, string, newline=True, buf=sys.stdout):
         """
         Log a message to the STDOUT
         """
-
         if newline:
             string += '\n'
         buf.write(string)
@@ -151,14 +208,12 @@ class Application(object):
         """
         Log an error message to the STDERR
         """
-
         self.log(string, newline, sys.stderr)
 
     def exit_with_error(self, message, retcode=1):
         """
         Put an error message to the STDERR and exit
         """
-
         self.log_error("%s: %s" % (sys.argv[0], message))
         sys.exit(retcode)
 
@@ -166,22 +221,21 @@ class Application(object):
         """
         Process a file (to check or pass it)
         """
-
         checker = self.get_checker(os.path.splitext(path)[1])
         if checker is None:
             return None
 
-        if self.params.compact:
+        if self.parameters_namespace.compact:
             self.log("Processing: " + path + "...", False)
-        elif not self.params.quiet:
+        elif not self.parameters_namespace.quiet:
             self.log("Processing: " + path + "...")
 
         result = None
 
-        if self.params.fix:
+        if self.parameters_namespace.fix:
             try:
                 result = checker.fix(path)
-                if self.params.compact:
+                if self.parameters_namespace.compact:
                     if result.is_success():
                         self.log("Some errors has been fixed\n")
                     else:
@@ -192,13 +246,13 @@ class Application(object):
                 )
         else:
             result = checker.check(path)
-            if self.params.compact:
+            if self.parameters_namespace.compact:
                 if result.is_success():
                     self.log(" Done")
                 else:
                     self.log(" Fail")
             else:
-                if result.output and not self.params.quiet:
+                if result.output and not self.parameters_namespace.quiet:
                     self.log("\n")
 
         return result
@@ -207,7 +261,6 @@ class Application(object):
         """
         Check code in directory (recursive)
         """
-
         for root, dirs, files in os.walk(path):
             # Exclude dirs
             dirs[:] = [d for d in dirs if not re.match(
@@ -222,7 +275,6 @@ class Application(object):
         """
         Check file or directory (recursive)
         """
-
         if not os.path.exists(path):
             self.exit_with_error("No such file or directory: " + path)
         elif os.path.isfile(path):
@@ -236,11 +288,13 @@ class Application(object):
         """
         Run a code checking
         """
-
-        self.params = self.parse_cmd_args()
-        self.check_force_language(self.params.language)
-        self.excludes = r'|'.join(
-            [fnmatch.translate(x) for x in self.params.exclude]) or r'$.'
+        self.parse_cmd_args(self._build_config_parser_cli_arguments())
+        self.parse_cmd_args()
+        self.check_force_language(self.parameters_namespace.language)
+        excludes = []
+        for exclude in self.parameters_namespace.exclude:
+            excludes.append(fnmatch.translate(exclude))
+        self.excludes = r'|'.join(excludes) or r'$.'
 
         self.log("Checking external dependencies....")
 
@@ -253,7 +307,7 @@ class Application(object):
         total_success = 0
         total_failed = 0
 
-        for path in self.params.target:
+        for path in self.parameters_namespace.target:
             for result in self.process_path(path):
                 if result is None:
                     continue

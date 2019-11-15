@@ -13,10 +13,10 @@ def which(program):
     """
     Get path of an executable file or None
     """
-
     def is_exe(fpath):
-        "Check file is executable"
-
+        """
+        Check file is executable
+        """
         return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
 
     fpath, _ = os.path.split(program)
@@ -36,9 +36,7 @@ def check_external_deps():
     """
     Check external dependencies
     """
-
-    binaries = ['npm', 'eslint', 'phpcs', 'phpcbf',
-                'csscomb', 'htmlcs']
+    binaries = ['npm', 'eslint', 'phpcs', 'phpcbf', 'csscomb', 'htmlcs']
     for binary in binaries:
         if not which(binary):
             raise DependencyError('%s is not installed' % binary)
