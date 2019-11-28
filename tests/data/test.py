@@ -5,7 +5,7 @@
 class foo(object):
     def __init__(self):
         number = 3
-        f_string = f"{number}"
+        f"{number}"
 
     async def async_test(self):
         pass
