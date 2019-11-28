@@ -1,8 +1,11 @@
+# coding: utf-8
+"""Settings for codestyle."""
+import os
+from configparser import ConfigParser
 from pathlib import Path
 
 from future import standard_library
-import os
-from configparser import ConfigParser
+
 standard_library.install_aliases()
 
 # Base project root
@@ -38,7 +41,7 @@ CHECKER_CFG = {
     'csscomb': parser.get(
         'checker_cfg_name',
         'csscomb',
-        fallback='csscomb.json'
+        fallback='csscomb.json',
     ),
     'phpcs': parser.get('checker_cfg_name', 'phpcs', fallback='phpcs.xml'),
     'htmlcs': parser.get('checker_cfg_name', 'htmlcs', fallback='htmlcs.json'),

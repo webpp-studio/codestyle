@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# coding: utf-8
 
 """
 Setuptools bootstrapping installer.
@@ -8,19 +8,18 @@ Maintained at https://github.com/pypa/setuptools/tree/bootstrap.
 Run this script to install or upgrade setuptools.
 """
 
-import os
-import shutil
-import sys
-import tempfile
-import zipfile
-import optparse
-import subprocess
-import platform
-import textwrap
+import codecs
 import contextlib
 import json
-import codecs
-
+import optparse
+import os
+import platform
+import shutil
+import subprocess  # noqa
+import sys
+import tempfile
+import textwrap
+import zipfile
 from distutils import log
 
 try:
@@ -37,7 +36,7 @@ except ImportError:
 
 LATEST = object()
 DEFAULT_VERSION = LATEST
-DEFAULT_URL = "https://pypi.io/packages/source/s/setuptools/"
+DEFAULT_URL = 'https://pypi.io/packages/source/s/setuptools/'
 DEFAULT_SAVE_DIR = os.curdir
 
 
@@ -48,7 +47,7 @@ def _python_cmd(*args):
     Return True if the command succeeded.
     """
     args = (sys.executable,) + args
-    return subprocess.call(args) == 0
+    return subprocess.call(args) == 0  # noqa
 
 
 def _install(archive_filename, install_args=()):
@@ -76,13 +75,14 @@ def _build_egg(egg, archive_filename, to_dir):
 
 
 class ContextualZipFile(zipfile.ZipFile):
-
     """Supplement ZipFile class to support context manager for Python 2.6."""
 
     def __enter__(self):
+        """Return self when open."""
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, file_type, value, traceback):
+        """Close self on exit."""
         self.close()
 
     def __new__(cls, *args, **kwargs):
@@ -100,7 +100,7 @@ def archive_context(filename):
     The unzipped target is cleaned up after.
     """
     tmpdir = tempfile.mkdtemp()
-    log.warn('Extracting in %s', tmpdir)
+    log.warn(f'Extracting in {tmpdir}')
     old_wd = os.getcwd()
     try:
         os.chdir(tmpdir)
@@ -110,7 +110,7 @@ def archive_context(filename):
         # going in the directory
         subdir = os.path.join(tmpdir, os.listdir(tmpdir)[0])
         os.chdir(subdir)
-        log.warn('Now working in %s', subdir)
+        log.warn(f'Now working in {subdir}')
         yield
 
     finally:
@@ -120,8 +120,8 @@ def archive_context(filename):
 
 def _do_download(version, download_base, to_dir, download_delay):
     """Download Setuptools."""
-    egg = os.path.join(to_dir, 'setuptools-%s-py%d.%d.egg'
-                       % (version, sys.version_info[0], sys.version_info[1]))
+    egg = os.path.join(to_dir, f'setuptools-{version}-py{sys.version_info[0]}.'
+                               f'{sys.version_info[1]}.egg')
     if not os.path.exists(egg):
         archive = download_setuptools(version, download_base,
                                       to_dir, download_delay)
@@ -156,7 +156,7 @@ def use_setuptools(
 
     try:
         import pkg_resources
-        pkg_resources.require("setuptools>=" + version)
+        pkg_resources.require('setuptools>=' + version)
         # a suitable version is already installed
         return
     except ImportError:
@@ -165,9 +165,9 @@ def use_setuptools(
     except pkg_resources.DistributionNotFound:
         # no version of setuptools was found; allow download
         pass
-    except pkg_resources.VersionConflict as VC_err:
+    except pkg_resources.VersionConflict as vc_err:
         if imported:
-            _conflict_bail(VC_err, version)
+            _conflict_bail(vc_err, version)
 
         # otherwise, unload pkg_resources to allow the downloaded version to
         #  take precedence.
@@ -177,10 +177,11 @@ def use_setuptools(
     return _do_download(version, download_base, to_dir, download_delay)
 
 
-def _conflict_bail(VC_err, version):
+def _conflict_bail(vc_err, version):
     """
-    Setuptools was imported prior to invocation, so it is
-    unsafe to unload it. Bail out.
+    Setuptools was imported prior to invocation, so it is unsafe to unload it.
+
+    Bail out.
     """
     conflict_tmpl = textwrap.dedent("""
         The required version of setuptools (>={version}) is not available,
@@ -216,7 +217,7 @@ def _clean_check(cmd, target):
     If the command fails, clean up before re-raising the error.
     """
     try:
-        subprocess.check_call(cmd)
+        subprocess.check_call(cmd)  # noqa
     except subprocess.CalledProcessError:
         if os.access(target, os.F_OK):
             os.unlink(target)
@@ -232,11 +233,10 @@ def download_file_powershell(url, target):
     """
     target = os.path.abspath(target)
     ps_cmd = (
-        "[System.Net.WebRequest]::DefaultWebProxy.Credentials = "
-        "[System.Net.CredentialCache]::DefaultCredentials; "
+        '[System.Net.WebRequest]::DefaultWebProxy.Credentials = '
+        '[System.Net.CredentialCache]::DefaultCredentials; '
         '(new-object System.Net.WebClient).DownloadFile'
-        '("%(url)s", "%(target)s")'
-        % locals()
+        f'({locals()[0]}, {locals()[1]})'
     )
     cmd = [
         'powershell',
@@ -253,7 +253,7 @@ def has_powershell():
     cmd = ['powershell', '-Command', 'echo test']
     with open(os.path.devnull, 'wb') as devnull:
         try:
-            subprocess.check_call(cmd, stdout=devnull, stderr=devnull)
+            subprocess.check_call(cmd, stdout=devnull, stderr=devnull)  # noqa
         except Exception:
             return False
     return True
@@ -263,15 +263,17 @@ download_file_powershell.viable = has_powershell
 
 
 def download_file_curl(url, target):
+    """Download file by curl."""
     cmd = ['curl', url, '--location', '--silent', '--output', target]
     _clean_check(cmd, target)
 
 
 def has_curl():
+    """Check curl existence."""
     cmd = ['curl', '--version']
     with open(os.path.devnull, 'wb') as devnull:
         try:
-            subprocess.check_call(cmd, stdout=devnull, stderr=devnull)
+            subprocess.check_call(cmd, stdout=devnull, stderr=devnull)  # noqa
         except Exception:
             return False
     return True
@@ -281,15 +283,17 @@ download_file_curl.viable = has_curl
 
 
 def download_file_wget(url, target):
+    """Download file via wget."""
     cmd = ['wget', url, '--quiet', '--output-document', target]
     _clean_check(cmd, target)
 
 
 def has_wget():
+    """Check wget existence."""
     cmd = ['wget', '--version']
     with open(os.path.devnull, 'wb') as devnull:
         try:
-            subprocess.check_call(cmd, stdout=devnull, stderr=devnull)
+            subprocess.check_call(cmd, stdout=devnull, stderr=devnull)  # noqa
         except Exception:
             return False
     return True
@@ -300,7 +304,7 @@ download_file_wget.viable = has_wget
 
 def download_file_insecure(url, target):
     """Use Python to download the file, without connection authentication."""
-    src = urlopen(url)
+    src = urlopen(url)  # noqa
     try:
         # Read all the data in one block.
         data = src.read()
@@ -308,7 +312,7 @@ def download_file_insecure(url, target):
         src.close()
 
     # Write all the data in one block to avoid creating a partial file.
-    with open(target, "wb") as dst:
+    with open(target, 'wb') as dst:
         dst.write(data)
 
 
@@ -316,6 +320,7 @@ download_file_insecure.viable = lambda: True
 
 
 def get_best_downloader():
+    """Chooses best downloader."""
     downloaders = (
         download_file_powershell,
         download_file_curl,
@@ -345,25 +350,23 @@ def download_setuptools(
     version = _resolve_version(version)
     # making sure we use the absolute path
     to_dir = os.path.abspath(to_dir)
-    zip_name = "setuptools-%s.zip" % version
+    zip_name = f'setuptools-{version}.zip'
     url = download_base + zip_name
     saveto = os.path.join(to_dir, zip_name)
     if not os.path.exists(saveto):  # Avoid repeated downloads
-        log.warn("Downloading %s", url)
+        log.warn(f'Downloading {url}')
         downloader = downloader_factory()
         downloader(url, saveto)
     return os.path.realpath(saveto)
 
 
 def _resolve_version(version):
-    """
-    Resolve LATEST version
-    """
+    """Resolve LATEST version."""
     if version is not LATEST:
         return version
 
     meta_url = urljoin(DEFAULT_URL, '/pypi/setuptools/json')
-    resp = urlopen(meta_url)
+    resp = urlopen(meta_url)  # noqa
     with contextlib.closing(resp):
         try:
             charset = resp.info().get_content_charset()
@@ -392,21 +395,21 @@ def _parse_args():
         '--user', dest='user_install', action='store_true', default=False,
         help='install in user site package')
     parser.add_option(
-        '--download-base', dest='download_base', metavar="URL",
+        '--download-base', dest='download_base', metavar='URL',
         default=DEFAULT_URL,
         help='alternative URL from where to download the setuptools package')
     parser.add_option(
         '--insecure', dest='downloader_factory', action='store_const',
         const=lambda: download_file_insecure, default=get_best_downloader,
-        help='Use internal, non-validating downloader'
+        help='Use internal, non-validating downloader',
     )
     parser.add_option(
-        '--version', help="Specify which version to download",
+        '--version', help='Specify which version to download',
         default=DEFAULT_VERSION,
     )
     parser.add_option(
         '--to-dir',
-        help="Directory to save (and re-use) package",
+        help='Directory to save (and re-use) package',
         default=DEFAULT_SAVE_DIR,
     )
     options, args = parser.parse_args()
@@ -416,12 +419,12 @@ def _parse_args():
 
 def _download_args(options):
     """Return args for download_setuptools function from cmdline args."""
-    return dict(
-        version=options.version,
-        download_base=options.download_base,
-        downloader_factory=options.downloader_factory,
-        to_dir=options.to_dir,
-    )
+    return {
+        'version': options.version,
+        'download_base': options.download_base,
+        'downloader_factory': options.downloader_factory,
+        'to_dir': options.to_dir,
+    }
 
 
 def main():
