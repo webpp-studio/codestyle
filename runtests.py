@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """Runs unittests."""
 import os
 import unittest

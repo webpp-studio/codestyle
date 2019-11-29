@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """Setup."""
 from setuptools import find_packages, setup
 
@@ -38,7 +37,6 @@ setup(
         'flake8-print~=3.1.0',
         'flake8-string-format~=0.2.3',
         'flake8_builtins~=1.4.1',
-        'flake8_coding~=1.3.2',
         'flake8_commas~=2.0.0',
         'flake8_isort~=2.3',
         'flake8_pep3101~=1.2.1',

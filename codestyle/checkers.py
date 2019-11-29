@@ -1,4 +1,3 @@
-# coding: utf-8
 """Checkers for codestyle."""
 from __future__ import absolute_import
 

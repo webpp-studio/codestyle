@@ -1,4 +1,3 @@
-# coding: utf-8
 """Checking result classes."""
 from abc import ABCMeta, abstractmethod, abstractproperty
 from builtins import object, str
