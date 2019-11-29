@@ -1,4 +1,3 @@
-# coding: utf-8
 """Test checkers."""
 import argparse
 import unittest

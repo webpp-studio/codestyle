@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """Code style checker application."""
 from __future__ import absolute_import
 

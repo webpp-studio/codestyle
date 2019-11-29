@@ -1,4 +1,3 @@
-# coding: utf-8
 """Codestyle script."""
 
 from codestyle.application import Application

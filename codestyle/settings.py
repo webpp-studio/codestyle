@@ -1,4 +1,3 @@
-# coding: utf-8
 """Settings for codestyle."""
 import os
 from configparser import ConfigParser

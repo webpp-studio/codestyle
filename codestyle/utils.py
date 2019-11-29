@@ -1,4 +1,3 @@
-# coding: utf-8
 """Codestyle checker utils."""
 import os
 from subprocess import PIPE, Popen  # noqa
