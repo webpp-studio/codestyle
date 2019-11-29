@@ -21,7 +21,7 @@ class Application(object):
     """Codestyle checker application class."""
 
     # Checker classmap
-    CHECKERS = (
+    checkers_map = (
         ('.php', checkers.PHPChecker),
         (('.js', '.vue', '.ts', '.coffee'), checkers.JSChecker),
         ('.py', checkers.PythonChecker),
@@ -121,7 +121,7 @@ class Application(object):
     def create_checkers(self):
         """Create checker instances for extensions."""
         self.checkers = {}
-        for ext, checker_class in self.CHECKERS:
+        for ext, checker_class in self.checkers_map:
             if not issubclass(checker_class, checkers.BaseChecker):
                 raise TypeError('expected BaseChecker subclass')
             checker_instance = checker_class(application=self)

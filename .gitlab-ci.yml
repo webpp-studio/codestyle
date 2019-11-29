@@ -16,6 +16,9 @@ update tests image:
     - /kaniko/executor --cache=true --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/tests/Dockerfile --destination $CI_REGISTRY_IMAGE/tests:$CI_COMMIT_REF_SLUG
   only:
     - branches
+  except:
+    - /^release/\d+(\.\d+)*$/
+    - /^hotfix/\d+(\.\d+)*$/
 
 
 run unit tests:
@@ -24,6 +27,14 @@ run unit tests:
   script: tox
   only:
     - branches
+  except:
+    - /^release/\d+(\.\d+)*$/
+    - /^hotfix/\d+(\.\d+)*$/
+  artifacts:
+    paths:
+      - ./coverage.xml
+    expire_in: 1 hour
+
 
 check guidelines:
   stage: test
@@ -31,6 +42,9 @@ check guidelines:
   script: codestyle ./ --quiet --exclude './tests/data'
   only:
     - branches
+  except:
+    - /^release/\d+(\.\d+)*$/
+    - /^hotfix/\d+(\.\d+)*$/
 
 
 sonar:
@@ -43,6 +57,11 @@ sonar:
   script: /usr/bin/sonar-scanner-run.sh
   only:
     - branches
+  except:
+    - /^release/\d+(\.\d+)*$/
+    - /^hotfix/\d+(\.\d+)*$/
+  dependencies:
+    - run unit tests
 
 
 update release image:
