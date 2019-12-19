@@ -6,8 +6,8 @@ RUN \
     apk add --quiet --progress --no-cache \
             python3=~3.7 npm && \
     python3 setup.py --quiet install && \
-    npm install --production --global --no-optional \
-                jshint jscs jscs-fixer csscomb htmlcs walk brace-expansion && \
+    npm install --production --global --no-optional csscomb htmlcs walk \
+            brace-expansion eslint && \
     npm cache --force clean && \
     pear install --soft --onlyreqdeps PHP_CodeSniffer && \
     cd / && rm -rf /tmp/*

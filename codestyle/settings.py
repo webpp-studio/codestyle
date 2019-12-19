@@ -1,8 +1,10 @@
+"""Settings for codestyle."""
+import os
+from configparser import ConfigParser
 from pathlib import Path
 
 from future import standard_library
-import os
-from configparser import ConfigParser
+
 standard_library.install_aliases()
 
 # Base project root
@@ -21,8 +23,7 @@ parser.read([DEFAULT_CONFIG_FILE, USER_CONFIG_FILE])
 
 # Executable names
 CHECKER_EXE = {
-    'jshint': parser.get('exe', 'jshint', fallback='jshint'),
-    'jscs': parser.get('exe', 'jscs', fallback='jscs'),
+    'eslint': parser.get('exe', 'eslint', fallback='eslint'),
     'csscomb': parser.get('exe', 'csscomb', fallback='csscomb'),
     'pep8': parser.get('exe', 'pep8', fallback='pep8'),
     'autopep8': parser.get('exe', 'autopep8', fallback='autopep8'),
@@ -35,12 +36,11 @@ CHECKER_EXE = {
 
 # Config names for checkers
 CHECKER_CFG = {
-    'jshint': parser.get('checker_cfg_name', 'jshint', fallback='jshint.json'),
-    'jscs': parser.get('checker_cfg_name', 'jscs', fallback='jscs.json'),
+    'eslint': parser.get('checker_cfg_name', 'eslint', fallback='eslint.json'),
     'csscomb': parser.get(
         'checker_cfg_name',
         'csscomb',
-        fallback='csscomb.json'
+        fallback='csscomb.json',
     ),
     'phpcs': parser.get('checker_cfg_name', 'phpcs', fallback='phpcs.xml'),
     'htmlcs': parser.get('checker_cfg_name', 'htmlcs', fallback='htmlcs.json'),

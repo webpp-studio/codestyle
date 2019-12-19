@@ -1,22 +1,16 @@
-"""Codestyle checker utils"""
+"""Codestyle checker utils."""
 import os
-from subprocess import Popen, PIPE
+from subprocess import PIPE, Popen  # noqa
 
 
 class DependencyError(BaseException):
-    """
-    Raises if no some dependency found
-    """
+    """Raises if no some dependency found."""
 
 
 def which(program):
-    """
-    Get path of an executable file or None
-    """
+    """Get path of an executable file or None."""
     def is_exe(fpath):
-        """
-        Check file is executable
-        """
+        """Check file is executable."""
         return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
 
     fpath, _ = os.path.split(program)
@@ -24,7 +18,7 @@ def which(program):
         if is_exe(program):
             return program
     else:
-        for path in os.environ["PATH"].split(os.pathsep):
+        for path in os.environ['PATH'].split(os.pathsep):
             path = path.strip('"')
             exe_file = os.path.join(path, program)
             if is_exe(exe_file):
@@ -33,19 +27,16 @@ def which(program):
 
 
 def check_external_deps():
-    """
-    Check external dependencies
-    """
-    binaries = ['npm', 'jscs', 'jshint', 'phpcs', 'phpcbf',
-                'csscomb', 'htmlcs']
+    """Check external dependencies."""
+    binaries = ['npm', 'eslint', 'phpcs', 'phpcbf', 'csscomb', 'htmlcs']
     for binary in binaries:
         if not which(binary):
-            raise DependencyError('%s is not installed' % binary)
+            raise DependencyError(f'{binary} is not installed')
 
-    nodejs_libs = ['jscs-fixer', 'walk', 'brace-expansion']
+    nodejs_libs = ['walk', 'brace-expansion']
 
     for nodejs_lib in nodejs_libs:
-        npm_process = Popen(['npm', 'view', nodejs_lib, 'version'],
+        npm_process = Popen(['npm', 'view', nodejs_lib, 'version'],  # noqa
                             stdout=PIPE, stderr=PIPE)
         npm_output, npm_error = npm_process.communicate()
         if npm_error:
