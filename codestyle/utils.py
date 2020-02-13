@@ -28,7 +28,7 @@ def which(program):
 
 def check_external_deps():
     """Check external dependencies."""
-    binaries = ['npm', 'eslint', 'phpcs', 'phpcbf', 'csscomb', 'htmlcs']
+    binaries = ['npm', 'eslint', 'phpcs', 'phpcbf', 'stylelint', 'htmlcs']
     for binary in binaries:
         if not which(binary):
             raise DependencyError(f'{binary} is not installed')
