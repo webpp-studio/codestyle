@@ -114,7 +114,10 @@ class PythonChecker(BaseChecker):
     def get_check_commands(self):
         """List of check commands."""
         return (
-            (self.exe('flake8'), '--config=' + self.cfg('flake8')),
+            (self.exe('flake8'),
+             '--config=' + self.cfg('flake8'),
+             '--no-isort-config',
+             ),
         )
 
     def get_fix_commands(self):
