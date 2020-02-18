@@ -10,11 +10,10 @@ import sys
 from builtins import object, str
 from configparser import ConfigParser
 
-from codestyle.settings import DEFAULT_STANDARD_DIR  # noqa
-from codestyle.settings import PROJECT_INITIALIZATION_PATH  # noqa
-
-from . import checkers, settings
-from .utils import DependencyError, check_external_deps
+from codestyle import checkers, settings
+from codestyle.settings import (DEFAULT_STANDARD_DIR,
+                                PROJECT_INITIALIZATION_PATH)
+from codestyle.utils import DependencyError, check_external_deps
 
 
 class Application(object):
@@ -47,8 +46,8 @@ class Application(object):
         """Declare ArgumentParser's arguments."""
         self.boolean_arguments = 'fix', 'compact', 'quiet'
         self.argument_parser.add_argument(
-            'target', metavar='target', type=str, nargs='+',
-            help='files for a checking',
+            'target', metavar='target', type=str, nargs='*',
+            help='files for checking', default='.',
         )
         self.argument_parser.add_argument(
             '-i', '--fix', dest='fix', action='store_true',
@@ -90,32 +89,59 @@ class Application(object):
             'target', str(PROJECT_INITIALIZATION_PATH.parent)).split(' ')
         for parameter_name in parameters.keys():
             if parameter_name in self.boolean_arguments:
-                cli_argument = []
                 if parameters[parameter_name] == 'true':
-                    cli_argument.extend(f'--{parameter_name}')
+                    cli_arguments.append(f'--{parameter_name}')
             else:
                 parameter_value = parameters[parameter_name]
-                cli_argument = [parameter_value] + parameter_value.split(' ')
-            cli_arguments.extend(cli_argument)
+                cli_argument = '--' + parameter_name + '=' + parameter_value
+                cli_arguments.append(cli_argument)
         cli_arguments.extend(target_arguments)
         return cli_arguments
 
-    def _build_parameters_data(self) -> dict:
+    def _build_parameters_data(self, parameter: str = None) -> dict:
         """Extract ConfigParser's non empty parameters."""
         parameters_data = {}
         parameters = self.config_parser['parameters']
+        if parameter and parameter in self.config_parser['parameters']:
+            parameters_data.update({
+                parameter.lower(): parameters[parameter].strip()})
+            return parameters_data
+
         for parameter_name in filter(None, self.config_parser['parameters']):
             parameters_data.update({
-                parameter_name.lower(): parameters[parameter_name].strip(),
+                parameter_name.lower(): self.sanitize(
+                    parameters[parameter_name],
+                ),
             })
+
         return parameters_data
 
-    def get_config_parser_parameters(self) -> dict:
+    @staticmethod
+    def sanitize(value: str):
+        """
+        Clean and sanitize input data.
+
+        :param value: parameter value
+        :return: mixed
+        """
+        value = value.strip()
+
+        # String covert to boolean
+        if value.lower() in ('yes', 'true', 't', 'y', '1'):
+            return True
+        if value.lower() in ('no', 'false', 'f', 'n', '0'):
+            return False
+
+        return value
+
+    def get_config_parser_parameters(self, argument_name: str = None) -> dict:
         """Read project's initialization file and return parameters."""
         if self.settings.PROJECT_INITIALIZATION_PATH.is_file():
             self.config_parser.read(PROJECT_INITIALIZATION_PATH)
         if 'parameters' not in self.config_parser:
             return {}
+        if argument_name:
+            return self._build_parameters_data(argument_name)
         return self._build_parameters_data()
 
     def create_checkers(self):
@@ -165,7 +191,7 @@ class Application(object):
                 f'Unsupported language: {language}\n'
                 'Supported extensions: '
                 f'{", ".join([k for k in list(checker_map.keys())])}',
-                )
+            )
 
     def get_standard_dir(self):
         """Get a path of a coding standard directory."""
@@ -250,19 +276,12 @@ class Application(object):
     def run(self):
         """Run a code checking."""
         self.params = self.parse_cmd_args()
+
+        self.__join_with_config_params(self.params)
+
         self.check_force_language(self.params.language)
-        self.excludes = r'|'.join(
-            [fnmatch.translate(x) for x in self.params.exclude]) or r'$.'
-        """
-        Run a code checking
-        """
-        self.parse_cmd_args(self._build_config_parser_cli_arguments())
-        self.parse_cmd_args()
-        self.check_force_language(self.parameters_namespace.language)
-        excludes = []
-        for exclude in self.parameters_namespace.exclude:
-            excludes.append(fnmatch.translate(exclude))
-        self.excludes = r'|'.join(excludes) or r'$.'
+
+        self.__set_excludes()
 
         self.log('Checking external dependencies....')
 
@@ -275,7 +294,11 @@ class Application(object):
         total_success = 0
         total_failed = 0
 
-        for path in self.parameters_namespace.target:
+        if isinstance(self.parameters_namespace.target, list):
+            target = self.parameters_namespace.target
+        else:
+            target = self.parameters_namespace.target.split()
+        for path in target:
             for result in self.process_path(path):
                 if result is None:
                     continue
@@ -290,6 +313,36 @@ class Application(object):
         if total_failed > 0:
             sys.exit(1)
         sys.exit()
+
+    def __join_with_config_params(self, cli_params):
+        """
+        Replace cli params with config file based ones.
+
+        Cli params have more priority.
+        :param cli_params:
+        :return: void
+        """
+        config_params = self.get_config_parser_parameters()
+        for param in config_params:
+            # Rewrite default '.' target
+            if param == 'target' and cli_params.target == ['.']:
+                setattr(cli_params, param, config_params[param])
+
+            if not getattr(cli_params, param):
+                setattr(cli_params, param, config_params[param])
+
+    def __set_excludes(self):
+        """
+        Parse excludes, translate them into regexp.
+
+        :return: void
+        """
+        # Exclude from config file loads as string
+        if self.params.exclude is str:
+            self.params.exclude = self.params.exclude.split(' ')
+
+        self.excludes = r'|'.join(
+            [fnmatch.translate('*' + x) for x in self.params.exclude]) or r'$.'
 
 
 if __name__ == '__main__':
