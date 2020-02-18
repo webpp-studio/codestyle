@@ -60,7 +60,17 @@ Usage with docker
                                                                           [-e glob pattern [glob pattern ...]]
                                                                           target [target ...]
 
+Save custom parametres for each project
+---------------------------------------
 
+::
+
+  You can use file .codestyle.ini to store parametres of codestyle checking for each project.
+  1. Create file .codestyle.ini in the root directory of your project
+  2. In section [parameters] type needed parametres and values
+  3. File format and examples see in file /.codestyle.ini of this project
+  4. For --language parameter supported values are: php, js, vue, ts, coffee, py, css, less, html
+     Only one value for this parameter is available. By default all the languages is enabled.
 
 Example
 -------
