@@ -6,7 +6,7 @@ This script checks and auto fixes codestyle for all supported languages:
 1. PHP (phpcs)
 2. Python (flake8)
 3. Javascript (eslint)
-4. CSS (csscomb)
+4. CSS (stylelint)
 5. HTML (htmlcs)
 
 Installation
@@ -20,7 +20,7 @@ Installation
 
     # Install codestyle and dependencies
     pip install codestyle
-    npm install -g jshint jscs-fixer csscomb htmlcs walk brace-expansion
+    npm install -g jshint jscs-fixer stylelint htmlcs walk brace-expansion
     pear install PHP_CodeSniffer
 
 Usage
@@ -99,7 +99,7 @@ Dependencies
 2. phpcbf
 3. eslint (NodeJS)
 4. flake8
-5. csscomb (NodeJS)
+5. stylelint (NodeJS)
 6. htmlcs >= 0.1.4 (NodeJS)
 7. walk (NodeJS)
 8. brace-expansion (NodeJS)

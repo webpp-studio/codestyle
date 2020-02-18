@@ -114,7 +114,10 @@ class PythonChecker(BaseChecker):
     def get_check_commands(self):
         """List of check commands."""
         return (
-            (self.exe('flake8'), '--config=' + self.cfg('flake8')),
+            (self.exe('flake8'),
+             '--config=' + self.cfg('flake8'),
+             '--no-isort-config',
+             ),
         )
 
     def get_fix_commands(self):
@@ -131,15 +134,15 @@ class LessChecker(BaseChecker):
     def get_check_commands(self):
         """List of check commands."""
         return (
-            (self.exe('csscomb'), '--lint', '--verbose',
-             '--config', self.cfg('csscomb')),
+            (self.exe('stylelint'), '--formatter=verbose',
+             '--config', self.cfg('stylelint')),
         )
 
     def get_fix_commands(self):
         """List of fix commands."""
         return (
-            (self.exe('csscomb'), '--verbose',
-             '--config', self.cfg('csscomb')),
+            (self.exe('stylelint'), '--fix', '--formatter=verbose',
+             '--config', self.cfg('stylelint')),
         )
 
 

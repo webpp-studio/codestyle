@@ -24,7 +24,7 @@ parser.read([DEFAULT_CONFIG_FILE, USER_CONFIG_FILE])
 # Executable names
 CHECKER_EXE = {
     'eslint': parser.get('exe', 'eslint', fallback='eslint'),
-    'csscomb': parser.get('exe', 'csscomb', fallback='csscomb'),
+    'stylelint': parser.get('exe', 'stylelint', fallback='stylelint'),
     'pep8': parser.get('exe', 'pep8', fallback='pep8'),
     'autopep8': parser.get('exe', 'autopep8', fallback='autopep8'),
     'phpcs': parser.get('exe', 'phpcs', fallback='phpcs'),
@@ -37,10 +37,10 @@ CHECKER_EXE = {
 # Config names for checkers
 CHECKER_CFG = {
     'eslint': parser.get('checker_cfg_name', 'eslint', fallback='eslint.json'),
-    'csscomb': parser.get(
+    'stylelint': parser.get(
         'checker_cfg_name',
-        'csscomb',
-        fallback='csscomb.json',
+        'stylelint',
+        fallback='.stylelintsec.json',
     ),
     'phpcs': parser.get('checker_cfg_name', 'phpcs', fallback='phpcs.xml'),
     'htmlcs': parser.get('checker_cfg_name', 'htmlcs', fallback='htmlcs.json'),
