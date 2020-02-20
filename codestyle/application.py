@@ -9,6 +9,7 @@ import re
 import sys
 from builtins import object, str
 from configparser import ConfigParser
+import glob
 
 from codestyle import checkers, settings
 from codestyle.settings import (DEFAULT_STANDARD_DIR,
@@ -264,14 +265,17 @@ class Application(object):
 
     def process_path(self, path):
         """Check file or directory (recursive)."""
-        if not os.path.exists(path):
+        files = glob.glob(path)
+        if not files:
             self.exit_with_error('No such file or directory: ' + path)
-        elif os.path.isfile(path):
-            if not re.match(self.excludes, path):
-                yield self.process_file(path)
-        elif os.path.isdir(path):
-            for result in self.process_dir(path):
-                yield result
+
+        for file in files:
+            if os.path.isfile(file):
+                if not re.match(self.excludes, file):
+                    yield self.process_file(file)
+            elif os.path.isdir(file):
+                for result in self.process_dir(file):
+                    yield result
 
     def run(self):
         """Run a code checking."""
@@ -291,13 +295,12 @@ class Application(object):
             self.log_error(str(ex))
             sys.exit(1)
 
-        total_success = 0
-        total_failed = 0
-
+        total_success = total_failed = 0
         if isinstance(self.parameters_namespace.target, list):
             target = self.parameters_namespace.target
         else:
             target = self.parameters_namespace.target.split()
+
         for path in target:
             for result in self.process_path(path):
                 if result is None:
@@ -338,7 +341,7 @@ class Application(object):
         :return: void
         """
         # Exclude from config file loads as string
-        if self.params.exclude is str:
+        if isinstance(self.params.exclude, str):
             self.params.exclude = self.params.exclude.split(' ')
 
         self.excludes = r'|'.join(
