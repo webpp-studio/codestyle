@@ -4,17 +4,16 @@ from __future__ import absolute_import
 
 import argparse
 import fnmatch
+import glob
 import os
 import re
 import sys
 from builtins import object, str
 from configparser import ConfigParser
-import glob
 
 from codestyle import checkers, settings
-from codestyle.settings import (
-    DEFAULT_STANDARD_DIR, PROJECT_INITIALIZATION_PATH
-)
+from codestyle.settings import (DEFAULT_STANDARD_DIR,
+                                PROJECT_INITIALIZATION_PATH)
 from codestyle.utils import DependencyError, check_external_deps
 
 
