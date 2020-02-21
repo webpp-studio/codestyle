@@ -12,12 +12,13 @@ from configparser import ConfigParser
 import glob
 
 from codestyle import checkers, settings
-from codestyle.settings import (DEFAULT_STANDARD_DIR,
-                                PROJECT_INITIALIZATION_PATH)
+from codestyle.settings import (
+    DEFAULT_STANDARD_DIR, PROJECT_INITIALIZATION_PATH
+)
 from codestyle.utils import DependencyError, check_external_deps
 
 
-class Application(object):
+class Application(object):  # noqa: WPS214, WPS230, WPS338
     """Codestyle checker application class."""
 
     # Checker classmap
@@ -31,50 +32,82 @@ class Application(object):
 
     def __init__(self):
         """Init Application with attributes."""
+        self.params = None
         self.settings = settings
         self.parameters_namespace = argparse.Namespace(
-            standard=self.settings.DEFAULT_STANDARD_DIR)
+            standard=self.settings.DEFAULT_STANDARD_DIR
+        )
         self.checkers = None
         self.excludes = '$.'
         self.argument_parser = argparse.ArgumentParser(
-            description=str(self.__doc__))
+            description=str(self.__doc__)
+        )
         self.boolean_arguments = None
         self.config_parser = ConfigParser()
 
         self._add_arguments()
 
-    def _add_arguments(self) -> None:
+    def _add_arguments(self):
         """Declare ArgumentParser's arguments."""
-        self.boolean_arguments = 'fix', 'compact', 'quiet'
+        self.boolean_arguments = ('fix', 'compact', 'quiet')
         self.argument_parser.add_argument(
-            'target', metavar='target', type=str, nargs='*',
-            help='files for checking', default='.',
+            'target',
+            metavar='target',
+            type=str,
+            nargs='*',
+            help='files for checking',
+            default='.',
         )
         self.argument_parser.add_argument(
-            '-i', '--fix', dest='fix', action='store_true',
-            help='auto fix codestyle errors if possible', default=False,
+            '-i',
+            '--fix',
+            dest='fix',
+            action='store_true',
+            help='auto fix codestyle errors if possible',
+            default=False,
         )
         self.argument_parser.add_argument(
-            '-c', '--compact', dest='compact', action='store_true',
-            help='Show a compact output', default=False,
+            '-c',
+            '--compact',
+            dest='compact',
+            action='store_true',
+            help='Show a compact output',
+            default=False,
         )
         self.argument_parser.add_argument(
-            '-s', '--standard', dest='standard', type=str,
+            '-s',
+            '--standard',
+            dest='standard',
+            type=str,
             help='A path to a coding standard directory',
-            default=DEFAULT_STANDARD_DIR, metavar='standard-dir',
+            default=DEFAULT_STANDARD_DIR,
+            metavar='standard-dir',
         )
         self.argument_parser.add_argument(
-            '-l', '--language', dest='language', type=str,
+            '-l',
+            '--language',
+            dest='language',
+            type=str,
             help='force set the language for a checking',
-            metavar='language name', default=None,
+            metavar='language name',
+            default=None,
         )
         self.argument_parser.add_argument(
-            '-x', '--exclude', dest='exclude', type=str,
-            help='Exclude paths/files from checking', metavar='glob pattern',
-            nargs='+', default=(),
+            '-x',
+            '--exclude',
+            dest='exclude',
+            type=str,
+            help='Exclude paths/files from checking',
+            metavar='glob pattern',
+            nargs='+',
+            default=(),
         )
         self.argument_parser.add_argument(
-            '-q', '--quiet', dest='quiet', action='store_true', default=False,
+            '-q',
+            '--quiet',
+            dest='quiet',
+            action='store_true',
+            default=False,
             help='Quiets "Processing" message and warnings',
         )
 
@@ -87,15 +120,15 @@ class Application(object):
         cli_arguments = []
         parameters = self.get_config_parser_parameters()
         target_arguments = parameters.pop(
-            'target', str(PROJECT_INITIALIZATION_PATH.parent)).split(' ')
+            'target', str(PROJECT_INITIALIZATION_PATH.parent)
+        ).split(' ')
         for parameter_name in parameters.keys():
             if parameter_name in self.boolean_arguments:
                 if parameters[parameter_name] == 'true':
                     cli_arguments.append(f'--{parameter_name}')
             else:
                 parameter_value = parameters[parameter_name]
-                cli_argument = '--' + parameter_name + '=' + parameter_value
-                cli_arguments.append(cli_argument)
+                cli_arguments.append(f'--{parameter_name}={parameter_value}')
         cli_arguments.extend(target_arguments)
         return cli_arguments
 
@@ -105,7 +138,8 @@ class Application(object):
         parameters = self.config_parser['parameters']
         if parameter and parameter in self.config_parser['parameters']:
             parameters_data.update({
-                parameter.lower(): parameters[parameter].strip()})
+                parameter.lower(): parameters[parameter].strip(),
+            })
             return parameters_data
 
         for parameter_name in filter(None, self.config_parser['parameters']):
@@ -169,7 +203,8 @@ class Application(object):
         checkers_data = self.get_checkers()
         if self.parameters_namespace.language:  # forced language
             return checkers_data.get(
-                f'.{self.parameters_namespace.language}', None)
+                f'.{self.parameters_namespace.language}', None,
+            )
         return checkers_data.get(extension, None)
 
     def get_config_path(self, filename):
@@ -178,20 +213,43 @@ class Application(object):
 
     def parse_cmd_args(self, args=None):
         """Get parsed command line arguments."""
-        return self.argument_parser.parse_args(
-            args, namespace=self.parameters_namespace)
+        cli_params = self.argument_parser.parse_args(
+            args, namespace=self.parameters_namespace,
+        )
 
-    def check_force_language(self, language):
+        self.params = self.__join_with_config_params(cli_params)
+
+    def __join_with_config_params(self, cli_params):
+        """
+        Replace cli params with config file based ones.
+
+        Cli params have more priority.
+        :param cli_params:
+        :return: void
+        """
+        config_params = self.get_config_parser_parameters()
+        for param in config_params:
+            # Rewrite default '.' target
+            if param == 'target' and cli_params.target == ['.']:
+                setattr(cli_params, param, config_params[param])
+
+            if not getattr(cli_params, param):
+                setattr(cli_params, param, config_params[param])
+
+        return cli_params
+
+    def check_force_language(self):
         """Check for selected language."""
-        if language is None:
+        if not self.params.language:
             return
         checker_map = self.get_checkers()
-        ext = '.' + language.lower()
+        ext = '.' + self.params.language.lower()
         if ext not in checker_map:
+            keys = [key for key in list(checker_map.keys())]
             self.exit_with_error(
-                f'Unsupported language: {language}\n'
+                f'Unsupported language: {self.params.language}\n'
                 'Supported extensions: '
-                f'{", ".join([k for k in list(checker_map.keys())])}',
+                f'{", ".join(keys)}',
             )
 
     def get_standard_dir(self):
@@ -219,21 +277,13 @@ class Application(object):
         if checker is None:
             return None
 
-        if self.parameters_namespace.compact:
-            self.log('Processing: ' + path + '...', False)
-        elif not self.parameters_namespace.quiet:
+        if not self.parameters_namespace.quiet:
             self.log('Processing: ' + path + '...')
 
         result = None
-
         if self.parameters_namespace.fix:
             try:
-                result = checker.fix(path)
-                if self.parameters_namespace.compact:
-                    if result.is_success():
-                        self.log('Some errors has been fixed\n')
-                    else:
-                        self.log('No errors has been fixed\n')
+                result = self.__auto_fix_errors(checker, path)
             except NotImplementedError:
                 self.log_error(
                     'Auto fixing is not supported for this language\n',
@@ -245,21 +295,28 @@ class Application(object):
                     self.log(' Done')
                 else:
                     self.log(' Fail')
-            else:
-                if result.output and not self.parameters_namespace.quiet:
-                    self.log('\n')
+            elif result.output and not self.parameters_namespace.quiet:
+                self.log('\n')
 
+        return result
+
+    def __auto_fix_errors(self, checker, path):
+        result = checker.fix(path)
+        if self.parameters_namespace.compact:
+            res = 'Some' if result.is_success() else 'No'
+            self.log(res + ' errors has been fixed\n')
         return result
 
     def process_dir(self, path):
         """Check code in directory (recursive)."""
-        for root, dirs, files in os.walk(path):
-            # Exclude dirs
-            dirs[:] = [d for d in dirs if not re.match(
-                self.excludes, os.path.join(root, d))]
+        for root, folders, files in os.walk(path):
+            # Exclude folders
+            folders[:] = [folder for folder in folders if not re.match(
+                self.excludes, os.path.join(root, folder),
+            )]
             # Exclude files
-            files = [os.path.join(root, f) for f in files]
-            files = [f for f in files if not re.match(self.excludes, f)]
+            files = [os.path.join(root, f) for f in files] # noqa
+            files = [f for f in files if not re.match(self.excludes, f)] # noqa
             for file in files:
                 yield self.process_file(file)
 
@@ -267,7 +324,7 @@ class Application(object):
         """Check file or directory (recursive)."""
         files = glob.glob(path)
         if not files:
-            self.exit_with_error('No such file or directory: ' + path)
+            self.exit_with_error(f'No such file or directory: {path}')
 
         for file in files:
             if os.path.isfile(file):
@@ -279,15 +336,11 @@ class Application(object):
 
     def run(self):
         """Run a code checking."""
-        self.params = self.parse_cmd_args()
+        self.parse_cmd_args()
 
-        self.__join_with_config_params(self.params)
+        self.check_force_language()
 
-        self.check_force_language(self.params.language)
-
-        self.__set_excludes()
-
-        self.log('Checking external dependencies....')
+        self.set_excludes()
 
         try:
             check_external_deps()
@@ -295,12 +348,22 @@ class Application(object):
             self.log_error(str(ex))
             sys.exit(1)
 
-        total_success = total_failed = 0
+        self.check_files()
+
+        sys.exit()
+
+    def check_files(self):
+        """
+        Run file checking.
+
+        :return:
+        """
+        total_success = 0
+        total_failed = 0
         if isinstance(self.parameters_namespace.target, list):
             target = self.parameters_namespace.target
         else:
             target = self.parameters_namespace.target.split()
-
         for path in target:
             for result in self.process_path(path):
                 if result is None:
@@ -309,32 +372,12 @@ class Application(object):
                     total_success += 1
                 else:
                     total_failed += 1
-
         self.log(f'Total success: {total_success}')
         self.log(f'Total failed: {total_failed}')
-
         if total_failed > 0:
             sys.exit(1)
-        sys.exit()
 
-    def __join_with_config_params(self, cli_params):
-        """
-        Replace cli params with config file based ones.
-
-        Cli params have more priority.
-        :param cli_params:
-        :return: void
-        """
-        config_params = self.get_config_parser_parameters()
-        for param in config_params:
-            # Rewrite default '.' target
-            if param == 'target' and cli_params.target == ['.']:
-                setattr(cli_params, param, config_params[param])
-
-            if not getattr(cli_params, param):
-                setattr(cli_params, param, config_params[param])
-
-    def __set_excludes(self):
+    def set_excludes(self):
         """
         Parse excludes, translate them into regexp.
 
@@ -345,7 +388,8 @@ class Application(object):
             self.params.exclude = self.params.exclude.split(' ')
 
         self.excludes = r'|'.join(
-            [fnmatch.translate('*' + x) for x in self.params.exclude]) or r'$.'
+            [fnmatch.translate(exclude) for exclude in self.params.exclude],
+        ) or r'$.'
 
 
 if __name__ == '__main__':
