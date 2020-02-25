@@ -17,7 +17,7 @@ from codestyle.settings import (DEFAULT_STANDARD_DIR,
 from codestyle.utils import DependencyError, check_external_deps
 
 
-class Application(object):  # noqa: WPS214, WPS230, WPS338
+class Application(object):  # noqa: WPS214, WPS230, WPS338 todo fix
     """Codestyle checker application class."""
 
     # Checker classmap
