@@ -308,16 +308,11 @@ class Application(object):  # noqa: WPS214, WPS230, WPS338 todo fix
 
     def process_dir(self, path):
         """Check code in directory (recursive)."""
-        for root, folders, files in os.walk(path):
-            # Exclude folders
-            folders[:] = [folder for folder in folders if not re.match(
-                self.excludes, os.path.join(root, folder),
-            )]
-            # Exclude files
-            files = [os.path.join(root, f) for f in files] # noqa
-            files = [f for f in files if not re.match(self.excludes, f)] # noqa
+        for root, _folders, files in os.walk(path):
             for file in files:
-                yield self.process_file(file)
+                full_path = os.path.join(root, file)
+                if not re.search(self.excludes, full_path):
+                    yield self.process_file(full_path)
 
     def process_path(self, path):
         """Check file or directory (recursive)."""
@@ -363,6 +358,7 @@ class Application(object):  # noqa: WPS214, WPS230, WPS338 todo fix
             target = self.parameters_namespace.target
         else:
             target = self.parameters_namespace.target.split()
+
         for path in target:
             for result in self.process_path(path):
                 if result is None:
