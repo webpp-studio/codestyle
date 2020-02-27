@@ -17,8 +17,8 @@ update tests image:
   only:
     - branches
   except:
-    - /^release/\d+(\.\d+)*$/
-    - /^hotfix/\d+(\.\d+)*$/
+    - /^release\/v\d+(\.\d+)*$/
+    - /^hotfix\/v\d+(\.\d+)*$/
 
 
 run unit tests:
@@ -28,8 +28,8 @@ run unit tests:
   only:
     - branches
   except:
-    - /^release/\d+(\.\d+)*$/
-    - /^hotfix/\d+(\.\d+)*$/
+    - /^release\/v\d+(\.\d+)*$/
+    - /^hotfix\/v\d+(\.\d+)*$/
   artifacts:
     paths:
       - ./coverage.xml
@@ -43,8 +43,8 @@ check guidelines:
   only:
     - branches
   except:
-    - /^release/\d+(\.\d+)*$/
-    - /^hotfix/\d+(\.\d+)*$/
+    - /^release\/v\d+(\.\d+)*$/
+    - /^hotfix\/v\d+(\.\d+)*$/
 
 
 sonar:
@@ -58,8 +58,8 @@ sonar:
   only:
     - branches
   except:
-    - /^release/\d+(\.\d+)*$/
-    - /^hotfix/\d+(\.\d+)*$/
+    - /^release\/v\d+(\.\d+)*$/
+    - /^hotfix\/v\d+(\.\d+)*$/
   dependencies:
     - run unit tests
 
@@ -72,8 +72,8 @@ update release image:
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
     - /kaniko/executor --cache=true --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
   only:
-    - /^release/\d+(\.\d+)*$/
-    - /^hotfix/\d+(\.\d+)*$/
+    - /^release\/v\d+(\.\d+)*$/
+    - /^hotfix\/v\d+(\.\d+)*$/
   except:
     - tags
 
@@ -85,8 +85,8 @@ update pre release image:
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
     - /kaniko/executor --cache=true --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:pre-release
   only:
-    - /^release/\d+(\.\d+)*$/
-    - /^hotfix/\d+(\.\d+)*$/
+    - /^release\/v\d+(\.\d+)*$/
+    - /^hotfix\/v\d+(\.\d+)*$/
   except:
     - branches
 
@@ -98,7 +98,7 @@ update latest image:
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
     - /kaniko/executor --cache=true --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:latest
   only:
-    - /^release/\d+(\.\d+)*$/
-    - /^hotfix/\d+(\.\d+)*$/
+    - /^release\/v\d+(\.\d+)*$/
+    - /^hotfix\/v\d+(\.\d+)*$/
   except:
     - branches

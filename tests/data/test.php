@@ -2,13 +2,17 @@
 
 function testMyFunc($arg1, $arg2)
 {
-    return 100 * 0.1;
+    $var = $arg1 + $arg2;
+
+    return $var * 0.1;
 }
 
 
 function testMyFunc( $arg1, $agg   )
 {
-    return 100 / 20;
+    $var = $arg1 + $agg;
+
+    return $var / 20;
 }
 
 function test()
