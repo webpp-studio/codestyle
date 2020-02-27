@@ -59,56 +59,74 @@ class TestApplication(unittest.TestCase):
 
     def test_parse_cmd_default_args(self):
         """Test parse_cmd_args with default args."""
-        parameters_namespace = self.application.parse_cmd_args(['test.py'])
-        self.assertEqual(parameters_namespace.target, ['test.py'])
-        self.assertIsInstance(parameters_namespace, argparse.Namespace)
-        self.assertFalse(parameters_namespace.compact)
-        self.assertIsInstance(parameters_namespace.exclude, tuple)
-        self.assertEqual(len(parameters_namespace.exclude), 0)
-        self.assertIsNone(parameters_namespace.language)
-        self.assertTrue(os.path.isdir(parameters_namespace.standard))
+        self.application.parse_cmd_args(['test.py'])
+        self.assertEqual(
+            self.application.parameters_namespace.target, ['test.py']
+        )
+        self.assertIsInstance(
+            self.application.parameters_namespace, argparse.Namespace
+        )
+        self.assertFalse(self.application.parameters_namespace.compact)
+        self.assertIsInstance(
+            self.application.parameters_namespace.exclude, tuple
+        )
+        self.assertEqual(
+            len(self.application.parameters_namespace.exclude), 0
+        )
+        self.assertIsNone(self.application.parameters_namespace.language)
+        self.assertTrue(
+            os.path.isdir(self.application.parameters_namespace.standard)
+        )
 
     def test_parse_cmd_args(self):
         """Test parse_cmd_args."""
-        parameters_namespace = self.application.parse_cmd_args([
+        self.application.parse_cmd_args([
             'test1.js', 'test2.html',
         ])
-        self.assertEqual(parameters_namespace.target,
+        self.assertEqual(self.application.parameters_namespace.target,
                          ['test1.js', 'test2.html'])
 
-        parameters_namespace = self.application.parse_cmd_args(
-            ['-i', 'test.js'])
-        self.assertTrue(parameters_namespace.fix)
-        parameters_namespace = self.application.parse_cmd_args(
+        self.application.parse_cmd_args(
+            ['-i', 'test.js']
+        )
+        self.assertTrue(self.application.parameters_namespace.fix)
+        self.application.parse_cmd_args(
             ['--fix', 'test.js'])
 
-        parameters_namespace = self.application.parse_cmd_args(
+        self.application.parse_cmd_args(
             ['-c', 'test.js'])
-        self.assertTrue(parameters_namespace.compact)
-        parameters_namespace = self.application.parse_cmd_args(
+        self.assertTrue(self.application.parameters_namespace.compact)
+        self.application.parse_cmd_args(
             ['--compact', 'test.js'])
-        self.assertTrue(parameters_namespace.compact)
+        self.assertTrue(self.application.parameters_namespace.compact)
 
-        parameters_namespace = self.application.parse_cmd_args(
+        self.application.parse_cmd_args(
             ['-l', 'html', 'test.xml'])
-        self.assertEqual(parameters_namespace.language, 'html')
-        parameters_namespace = self.application.parse_cmd_args(
-            ['--language', 'html', 'test.xml'])
-        self.assertEqual(parameters_namespace.language, 'html')
-
-        parameters_namespace = self.application.parse_cmd_args(
-            ['test.php', '-x', '/test/dir/', '*.html'],
+        self.assertEqual(
+            self.application.parameters_namespace.language, 'html'
         )
-        self.assertEqual(parameters_namespace.exclude,
+        self.application.parse_cmd_args(
+            ['--language', 'html', 'test.xml'])
+        self.assertEqual(
+            self.application.parameters_namespace.language, 'html'
+        )
+
+        self.application.parse_cmd_args([
+            'test.php', '-x', '/test/dir/', '*.html'],
+        )
+        self.assertEqual(self.application.parameters_namespace.exclude,
                          ['/test/dir/', '*.html'])
-        parameters_namespace = self.application.parse_cmd_args(
+        self.application.parse_cmd_args(
             ['--exclude=/test/dir/', 'test.php'],
         )
-        self.assertEqual(parameters_namespace.exclude, ['/test/dir/'])
+        self.assertEqual(
+            self.application.parameters_namespace.exclude, ['/test/dir/']
+        )
 
-        parameters_namespace = self.application.parse_cmd_args(
-            ['-q', 'test.php'])
-        self.assertTrue(parameters_namespace.quiet)
+        self.application.parse_cmd_args(
+            ['-q', 'test.php']
+        )
+        self.assertTrue(self.application.parameters_namespace.quiet)
 
     def test_get_standard_dir(self):
         """Check if default standard dir exists."""
