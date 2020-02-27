@@ -34,12 +34,12 @@ class Application(object):  # noqa: WPS214, WPS230, WPS338 todo fix
         self.params = None
         self.settings = settings
         self.parameters_namespace = argparse.Namespace(
-            standard=self.settings.DEFAULT_STANDARD_DIR
+            standard=self.settings.DEFAULT_STANDARD_DIR,
         )
         self.checkers = None
         self.excludes = '$.'
         self.argument_parser = argparse.ArgumentParser(
-            description=str(self.__doc__)
+            description=str(self.__doc__),
         )
         self.boolean_arguments = None
         self.config_parser = ConfigParser()
@@ -50,63 +50,34 @@ class Application(object):  # noqa: WPS214, WPS230, WPS338 todo fix
         """Declare ArgumentParser's arguments."""
         self.boolean_arguments = ('fix', 'compact', 'quiet')
         self.argument_parser.add_argument(
-            'target',
-            metavar='target',
-            type=str,
-            nargs='*',
-            help='files for checking',
-            default='.',
+            'target', metavar='target', type=str, nargs='*',
+            help='files for checking', default='.',
         )
         self.argument_parser.add_argument(
-            '-i',
-            '--fix',
-            dest='fix',
-            action='store_true',
-            help='auto fix codestyle errors if possible',
-            default=False,
+            '-i', '--fix', dest='fix', action='store_true',
+            help='auto fix codestyle errors if possible', default=False,
         )
         self.argument_parser.add_argument(
-            '-c',
-            '--compact',
-            dest='compact',
-            action='store_true',
-            help='Show a compact output',
-            default=False,
+            '-c', '--compact', dest='compact', action='store_true',
+            help='Show a compact output', default=False,
         )
         self.argument_parser.add_argument(
-            '-s',
-            '--standard',
-            dest='standard',
-            type=str,
+            '-s', '--standard', dest='standard', type=str,
             help='A path to a coding standard directory',
-            default=DEFAULT_STANDARD_DIR,
-            metavar='standard-dir',
+            default=DEFAULT_STANDARD_DIR, metavar='standard-dir',
         )
         self.argument_parser.add_argument(
-            '-l',
-            '--language',
-            dest='language',
-            type=str,
+            '-l', '--language', dest='language', type=str,
             help='force set the language for a checking',
-            metavar='language name',
-            default=None,
+            metavar='language name', default=None,
         )
         self.argument_parser.add_argument(
-            '-x',
-            '--exclude',
-            dest='exclude',
-            type=str,
-            help='Exclude paths/files from checking',
-            metavar='glob pattern',
-            nargs='+',
-            default=(),
+            '-x', '--exclude', dest='exclude', type=str,
+            help='Exclude paths/files from checking', metavar='glob pattern',
+            nargs='+', default=(),
         )
         self.argument_parser.add_argument(
-            '-q',
-            '--quiet',
-            dest='quiet',
-            action='store_true',
-            default=False,
+            '-q', '--quiet', dest='quiet', action='store_true', default=False,
             help='Quiets "Processing" message and warnings',
         )
 
@@ -119,7 +90,7 @@ class Application(object):  # noqa: WPS214, WPS230, WPS338 todo fix
         cli_arguments = []
         parameters = self.get_config_parser_parameters()
         target_arguments = parameters.pop(
-            'target', str(PROJECT_INITIALIZATION_PATH.parent)
+            'target', str(PROJECT_INITIALIZATION_PATH.parent),
         ).split(' ')
         for parameter_name in parameters.keys():
             if parameter_name in self.boolean_arguments:
