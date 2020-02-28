@@ -9,7 +9,7 @@ RUN cd /usr/src/app && \
     curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
     apt-get -qy install --no-install-recommends python3.7 python3-distutils \
         nodejs php-pear && \
-    npm install -g stylelint htmlcs walk brace-expansion eslint && \
+    npm install -g stylelint htmlcs walk brace-expansion eslint eslint-plugin-vue && \
     pear channel-update pear.php.net && \
     pear install PHP_CodeSniffer && \
     rm -rf /var/lib/apt/lists/*
