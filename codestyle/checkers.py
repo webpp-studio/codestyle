@@ -76,7 +76,9 @@ class JSChecker(BaseChecker):
     def get_check_commands(self):
         """List of check commands."""
         return (
-            (self.exe('eslint'), '--config', self.cfg('eslint')),
+            (self.exe('eslint'),
+             '--ext', '.js,.vue',
+             '--config', self.cfg('eslint')),
         )
 
     def get_fix_commands(self):

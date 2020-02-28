@@ -7,7 +7,7 @@ RUN \
             python3=~3.7 npm && \
     python3 setup.py --quiet install && \
     npm install --production --global --no-optional stylelint htmlcs walk \
-            brace-expansion eslint && \
+            brace-expansion eslint eslint-plugin-vue && \
     npm cache --force clean && \
     pear install --soft --onlyreqdeps PHP_CodeSniffer && \
     cd / && rm -rf /tmp/*

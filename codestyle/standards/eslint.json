@@ -4,7 +4,8 @@
        "es6": true
    },
    "extends": [
-       "eslint:recommended"
+       "eslint:recommended",
+       "plugin:vue/recommended"
    ],
    "globals": {
        "Atomics": "readonly",
@@ -17,5 +18,39 @@
    "plugins": [
    ],
    "rules": {
+        "vue/script-indent": ["error", 4, {
+            "baseIndent": 0,
+            "switchCase": 0,
+            "ignores": []
+        }],
+        "vue/html-indent": ["error", 4, {
+            "attribute": 1,
+            "baseIndent": 1,
+            "closeBracket": 0,
+            "alignAttributesVertically": true,
+            "ignores": []
+        }],
+        "vue/html-self-closing": ["error", {
+            "html": {
+                "void": "always",
+                "normal": "never",
+                "component": "always"
+            },
+            "svg": "always",
+            "math": "always"
+        }],
+        "vue/no-v-html": 0,
+        "vue/singleline-html-element-content-newline": ["error", {
+            "ignoreWhenNoAttributes": true,
+            "ignoreWhenEmpty": true,
+            "ignores": ["pre", "textarea", "span", "h1", "h2", "h3", "h4", "h5", "h6", "i", "b", "td", "p"]
+        }],
+        "vue/max-attributes-per-line": ["error", {
+            "singleline": 2,
+            "multiline": {
+                "max": 1,
+                "allowFirstLine": true
+            }
+         }]
    }
 }
