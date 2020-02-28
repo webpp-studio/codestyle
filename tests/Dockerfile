@@ -10,7 +10,7 @@ RUN cd /usr/src/app && \
     apt-get -qy install --no-install-recommends python3.7 python3-distutils \
         nodejs php-pear && \
     npm -g install stylelint htmlcs walk brace-expansion eslint && \
-    npm install eslint-plugin-vue && \
+    npm install eslint eslint-plugin-vue && \
     pear channel-update pear.php.net && \
     pear install PHP_CodeSniffer && \
     rm -rf /var/lib/apt/lists/*
