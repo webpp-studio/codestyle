@@ -117,8 +117,7 @@ class PythonChecker(BaseChecker):
         """List of check commands."""
         return (
             (self.exe('flake8'),
-             '--config=' + self.cfg('flake8'),
-             '--no-isort-config',
+             '--config=' + self.cfg('flake8')
              ),
         )
 
