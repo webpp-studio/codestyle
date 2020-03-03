@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='codestyle',
-    version='2.0.1',
+    version='2.1.0',
     author=u'Sergey Levitin',
     author_email='selevit@gmail.com',
     packages=find_packages(),
