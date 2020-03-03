@@ -2,7 +2,7 @@
 import os
 from configparser import ConfigParser
 from pathlib import Path
-from subprocess import run  # noqa
+from subprocess import check_output  # noqa
 
 from future import standard_library
 
@@ -16,8 +16,7 @@ DEFAULT_CONFIG_FILE = os.path.join(BASE_DIR, 'defaults.cfg')
 
 PROJECT_INITIALIZATION_PATH = Path.cwd() / '.codestyle.ini'
 
-NPM_ROOT = run(['npm', 'root', '-g'], capture_output=True,  # noqa
-               encoding='utf-8').stdout.rstrip()  # noqa
+NPM_ROOT = check_output(['npm', 'root', '-g']).decode('utf-8').rstrip()  # noqa
 
 # Custom user configuration file path
 USER_CONFIG_FILE = os.path.expanduser('~/.config/codestyle.cfg')
