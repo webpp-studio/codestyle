@@ -10,7 +10,7 @@ from subprocess import STDOUT  # noqa
 from future.utils import with_metaclass
 
 from .result import Result, ResultSet
-from .settings import parser
+from .settings import NPM_ROOT, parser
 
 DEVNULL = open(os.devnull, 'wb')
 
@@ -78,13 +78,16 @@ class JSChecker(BaseChecker):
         return (
             (self.exe('eslint'),
              '--ext', '.js,.vue',
-             '--config', self.cfg('eslint')),
+             '--config', self.cfg('eslint'),
+             '--resolve-plugins-relative-to', NPM_ROOT),
         )
 
     def get_fix_commands(self):
         """List of fix commands."""
         return (
-            (self.exe('eslint'), '--fix', '--config', self.cfg('eslint')),
+            (self.exe('eslint'), '--fix',
+             '--config', self.cfg('eslint'),
+             '--resolve-plugins-relative-to', NPM_ROOT),
         )
 
 
