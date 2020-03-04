@@ -1,23 +1,23 @@
 {
     "env": {
-       "browser": true,
-       "es6": true
-   },
-   "extends": [
-       "eslint:recommended",
-       "plugin:vue/recommended"
-   ],
-   "globals": {
-       "Atomics": "readonly",
-       "SharedArrayBuffer": "readonly"
-   },
-   "parserOptions": {
-       "ecmaVersion": 2018,
-       "sourceType": "module"
-   },
-   "plugins": [
-   ],
-   "rules": {
+        "browser": true,
+        "es6": true
+    },
+    "extends": [
+        "eslint:recommended",
+        "plugin:vue/recommended"
+    ],
+    "globals": {
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly"
+    },
+    "parserOptions": {
+        "ecmaVersion": 2018,
+        "sourceType": "module"
+    },
+    "plugins": [
+    ],
+    "rules": {
         "vue/script-indent": ["error", 4, {
             "baseIndent": 0,
             "switchCase": 0,
@@ -44,16 +44,20 @@
             "ignoreWhenNoAttributes": true,
             "ignoreWhenEmpty": true,
             "ignores": [
-                "pre", "textarea", ...INLINE_ELEMENTS,
+                "pre", "textarea", "a", "abbr", "audio", "b", "bdi", "bdo", "canvas", "cite", "code", "data", "del",
+                "dfn", "em", "i", "iframe", "ins", "kbd", "label", "map", "mark", "noscript", "object", "output", "q",
+                "picture", "ruby", "s", "samp", "small", "span", "strong", "sub", "sup", "svg", "time", "u", "var",
+                "video",
                 "h1", "h2", "h3", "h4", "h5", "h6",
                 "td", "th", "p", "button"
-            ],
+            ]
+        }],
         "vue/max-attributes-per-line": ["error", {
             "singleline": 2,
             "multiline": {
                 "max": 1,
                 "allowFirstLine": true
             }
-         }]
-   }
+        }]
+    }
 }
