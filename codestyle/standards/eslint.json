@@ -43,8 +43,11 @@
         "vue/singleline-html-element-content-newline": ["error", {
             "ignoreWhenNoAttributes": true,
             "ignoreWhenEmpty": true,
-            "ignores": ["pre", "textarea", "span", "h1", "h2", "h3", "h4", "h5", "h6", "i", "b", "td", "p"]
-        }],
+            "ignores": [
+                "pre", "textarea", ...INLINE_ELEMENTS,
+                "h1", "h2", "h3", "h4", "h5", "h6",
+                "td", "th", "p", "button"
+            ],
         "vue/max-attributes-per-line": ["error", {
             "singleline": 2,
             "multiline": {
