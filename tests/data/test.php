@@ -8,7 +8,7 @@ function testMyFunc($arg1, $arg2)
 }
 
 
-function testMyFunc( $arg1, $agg   )
+function testMyFunc($arg1, $agg)
 {
     $var = $arg1 + $agg;
 
@@ -18,4 +18,11 @@ function testMyFunc( $arg1, $agg   )
 function test()
 {
     return "тестовая длинная строка не-ansi символов для проверки длины";
+}
+
+function testMultiLineFunc(
+    int param1,
+    int param2
+): int {
+    return param1 * param2;
 }
