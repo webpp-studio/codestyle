@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ruleset name="Web++ Ruleset">
-<description>Web++ PHP Coding Standard
-</description>
+<description>Web++ PHP Coding Standard</description>
+<rule ref="PSR12"/>
 <rule ref="Generic.CodeAnalysis.EmptyStatement"/>
 <rule ref="Generic.CodeAnalysis.JumbledIncrementer"/>
 <rule ref="Generic.CodeAnalysis.UnconditionalIfStatement"/>
@@ -20,7 +20,6 @@
 <rule ref="Generic.Formatting.DisallowMultipleStatements"/>
 <rule ref="Generic.Formatting.SpaceAfterCast"/>
 <rule ref="Generic.Functions.CallTimePassByReference"/>
-<rule ref="Generic.Functions.OpeningFunctionBraceBsdAllman"/>
 <rule ref="Generic.Metrics.CyclomaticComplexity"/>
 <rule ref="Generic.Metrics.NestingLevel"/>
 <rule ref="Generic.NamingConventions.ConstructorName"/>
@@ -73,5 +72,4 @@
 <rule ref="Squiz.WhiteSpace.ScopeClosingBrace"/>
 <rule ref="Squiz.WhiteSpace.SemicolonSpacing"/>
 <rule ref="Squiz.WhiteSpace.SuperfluousWhitespace"/>
-
 </ruleset>
