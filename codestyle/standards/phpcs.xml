@@ -36,7 +36,6 @@
 <rule ref="PEAR.Classes.ClassDeclaration"/>
 <rule ref="PEAR.ControlStructures.ControlSignature"/>
 <rule ref="PEAR.ControlStructures.MultiLineCondition"/>
-<rule ref="PEAR.Files.IncludingFile"/>
 <rule ref="PEAR.Formatting.MultiLineAssignment"/>
 <rule ref="PEAR.Functions.FunctionDeclaration"/>
 <rule ref="PEAR.Functions.ValidDefaultValue"/>
