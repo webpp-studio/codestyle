@@ -19,6 +19,8 @@ class FooTest
  */
 function testFunc(int $arg1, int $arg2)
 {
+    require 'foo.php';
+
     $var = $arg1 + $arg2;
 
     return $var * 0.1;
