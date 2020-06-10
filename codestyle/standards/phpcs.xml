@@ -36,7 +36,6 @@
 <rule ref="PEAR.Classes.ClassDeclaration"/>
 <rule ref="PEAR.ControlStructures.ControlSignature"/>
 <rule ref="PEAR.ControlStructures.MultiLineCondition"/>
-<rule ref="PEAR.Files.IncludingFile"/>
 <rule ref="PEAR.Formatting.MultiLineAssignment"/>
 <rule ref="PEAR.Functions.FunctionDeclaration"/>
 <rule ref="PEAR.Functions.ValidDefaultValue"/>
@@ -59,7 +58,6 @@
 </rule>
 <rule ref="Squiz.PHP.Eval"/>
 <rule ref="Squiz.PHP.GlobalKeyword"/>
-<rule ref="Squiz.PHP.Heredoc"/>
 <rule ref="Squiz.PHP.NonExecutableCode"/>
 <rule ref="Squiz.Scope.MemberVarScope"/>
 <rule ref="Squiz.Scope.MethodScope"/>
