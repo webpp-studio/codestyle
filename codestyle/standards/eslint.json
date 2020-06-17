@@ -5,7 +5,8 @@
     },
     "extends": [
         "eslint:recommended",
-        "plugin:vue/recommended"
+        "plugin:vue/recommended",
+        "plugin:jsdoc/recommended"
     ],
     "globals": {
         "Atomics": "readonly",
@@ -16,6 +17,8 @@
         "sourceType": "module"
     },
     "plugins": [
+        "jsdoc",
+        "strict-vue"
     ],
     "rules": {
         "vue/script-indent": ["error", 4, {
@@ -58,6 +61,7 @@
                 "max": 1,
                 "allowFirstLine": true
             }
-        }]
+        }],
+        "strict-vue/require-jsdoc": "error"
     }
 }
