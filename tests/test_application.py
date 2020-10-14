@@ -8,6 +8,9 @@ from codestyle.application import ConsoleApplication
 from codestyle.system_wrappers import ExitCodes
 
 
+MOCK_TEST_FILE = '/code/test_dir/test_file.py'
+
+
 class TestConsoleApplication(TestCase):
     """Проверки консольного приложения."""
 
@@ -32,7 +35,7 @@ class TestConsoleApplication(TestCase):
     ):
         """Проверка инициализации с fix методом."""
         mock_parameters_storage = Mock(
-            target=('/code/test_dir/test_file.py',),
+            target=(MOCK_TEST_FILE,),
             fix=True,
             exclude=('/code/test_dir/test_exclude.py',),
         )
@@ -71,7 +74,7 @@ class TestConsoleApplication(TestCase):
         self.assertEqual(True, mocked_tree.called)
         self.assertEqual(1, mocked_tree.call_count)
         args, kwargs = mocked_tree.call_args
-        self.assertTupleEqual(('/code/test_dir/test_file.py',), args)
+        self.assertTupleEqual((MOCK_TEST_FILE,), args)
         self.assertDictEqual(
             {'excludes': ('/code/test_dir/test_exclude.py',)}, kwargs
         )
@@ -95,7 +98,7 @@ class TestConsoleApplication(TestCase):
         mocked_messages.__getitem__ = mock_get_item
 
         mock_parameters_storage = Mock(
-            target=('/code/test_dir/test_file.py',),
+            target=(MOCK_TEST_FILE,),
             fix=False,
             exclude=('/code/test_dir/test_exclude.py',),
         )
