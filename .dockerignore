@@ -1,0 +1,11 @@
+.coverage
+.dockerignore/
+.gitignore/
+.gitlab-ci.yml
+.idea/
+__pycache__/
+ci/
+coverage.xml
+docker-compose.yml
+Dockerfile
+node_modules/

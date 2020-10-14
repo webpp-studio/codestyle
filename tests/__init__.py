@@ -1,1 +1,1 @@
-"""Test for codestyle."""
+"""Unit-тесты приложения."""

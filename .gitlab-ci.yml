@@ -7,42 +7,39 @@ stages:
   - analyze
   - deploy
 
-
-update tests image:
+test image:
   stage: build
   image: gcr.io/kaniko-project/executor:debug
   script:
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --cache=true --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/tests/Dockerfile --destination $CI_REGISTRY_IMAGE/tests:$CI_COMMIT_REF_SLUG
+    - /kaniko/executor --cache=true --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/tests/Dockerfile --destination $CI_REGISTRY_IMAGE/test:$CI_COMMIT_REF_SLUG
   only:
     - branches
   except:
     - /^v\d+(\.\d+)*$/
 
-
-run unit tests:
+units:
   stage: test
-  image: $CI_REGISTRY_IMAGE/tests:$CI_COMMIT_REF_SLUG
-  script: tox
+  image: $CI_REGISTRY_IMAGE/test:$CI_COMMIT_REF_SLUG
+  script: python -m tox
   only:
     - branches
   except:
     - /^v\d+(\.\d+)*$/
+  coverage: '/^TOTAL.+([0-9.]{5}\%)/'
   artifacts:
     paths:
       - ./coverage.xml
     expire_in: 1 hour
 
-
-check guidelines:
+guidelines:
   stage: test
   image: $CI_REGISTRY_IMAGE:latest
-  script: codestyle ./ --quiet --exclude './tests/data'
+  script: codestyle ./codestyle ./tests ./setup.py --exclude ./codestyle/tool_settings
   only:
     - branches
   except:
     - /^v\d+(\.\d+)*$/
-
 
 sonar:
   stage: analyze
@@ -57,11 +54,10 @@ sonar:
   except:
     - /^v\d+(\.\d+)*$/
   dependencies:
-    - run unit tests
+    - units
 
 
-# build images
-update release image:
+release image:
   stage: deploy
   image: gcr.io/kaniko-project/executor:debug
   script:
@@ -72,7 +68,7 @@ update release image:
   except:
     - tags
 
-update pre release image:
+prerelease image:
   stage: deploy
   image: gcr.io/kaniko-project/executor:debug
   when: manual
@@ -84,7 +80,7 @@ update pre release image:
   except:
     - branches
 
-update latest image:
+latest image:
   stage: deploy
   image: gcr.io/kaniko-project/executor:debug
   when: manual
@@ -95,3 +91,19 @@ update latest image:
     - /^v\d+(\.\d+)*$/
   except:
     - branches
+
+pages:
+  stage: deploy
+  image: $CI_REGISTRY_IMAGE/test:$CI_COMMIT_REF_SLUG
+  script:
+    - python -m pip install sphinx
+    - cd docs
+    - ./build-html.sh
+    - mkdir ../public
+    - mv _build/* ../public
+    - cd ..
+  artifacts:
+    paths:
+      - public
+  only:
+    - master

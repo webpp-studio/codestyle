@@ -1,1 +1,0 @@
-stylelint htmlcs walk brace-expansion eslint eslint-plugin-vue eslint-plugin-jsdoc eslint-plugin-strict-vue

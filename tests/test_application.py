@@ -1,168 +1,306 @@
-"""Test application."""
-import argparse
-import os
-import unittest
+"""Проверки модуля application."""
+from logging import ERROR, INFO
+from pathlib import Path
+from unittest import TestCase
+from unittest.mock import Mock, call, patch
 
-import mock
-# noqa
-from codestyle import application, checkers, settings  # noqa
+from codestyle.application import ConsoleApplication
+from codestyle.system_wrappers import ExitCodes
 
 
-class TestApplication(unittest.TestCase):
-    """Tests for codestyle.application class."""
+class TestConsoleApplication(TestCase):
+    """Проверки консольного приложения."""
 
-    def setUp(self):
-        """Setups for initial data."""
-        self.application = application.Application()
-        self.application.parameters_namespace = argparse.Namespace(
-            language=None,
-            standard=settings.DEFAULT_STANDARD_DIR,
+    @patch.object(ConsoleApplication, 'logger', new_callable=Mock)
+    @patch('codestyle.application.MESSAGES', new_callable=Mock)
+    @patch('codestyle.application.ExpandedPathTree', new_callable=Mock)
+    @patch.object(
+        ConsoleApplication,
+        '_ConsoleApplication__create_tools',
+        new_callable=Mock,
+    )
+    @patch.object(
+        ConsoleApplication, 'get_file_suffix_tools', new_callable=Mock
+    )
+    def test_init_with_fix__method(
+        self,
+        mocked_file_suffix_tools_getter: Mock,
+        mocked_create_tools: Mock,
+        mocked_tree: Mock,
+        mocked_messages: Mock,
+        mocked_logger: Mock,
+    ):
+        """Проверка инициализации с fix методом."""
+        mock_parameters_storage = Mock(
+            target=('/code/test_dir/test_file.py',),
+            fix=True,
+            exclude=('/code/test_dir/test_exclude.py',),
         )
 
-    def test_create_checkers(self):
-        """Create checkers."""
-        self.assertIsNone(self.application.checkers)
-        self.application.create_checkers()
-        self.assertIsInstance(self.application.checkers, dict)
+        mock_get_item = Mock()
+        mocked_messages.__getitem__ = mock_get_item
 
-        for val in list(self.application.checkers.values()):
-            self.assertIsInstance(val, checkers.BaseChecker)
+        mock_debug_logger = Mock()
+        mocked_logger.debug = mock_debug_logger
 
-        self.assertGreater(len(self.application.checkers), 0)
+        ConsoleApplication(mock_parameters_storage)
 
-    def test_get_checkers(self):
-        """Test get_checkers."""
-        self.assertIsInstance(self.application.get_checkers(), dict)
+        self.assertEqual(True, mocked_file_suffix_tools_getter.called)
+        self.assertEqual(1, mocked_file_suffix_tools_getter.call_count)
+        args, kwargs = mocked_file_suffix_tools_getter.call_args
+        self.assertTupleEqual((mocked_create_tools.return_value,), args)
+        self.assertDictEqual({}, kwargs)
 
-    def test_get_checker(self):
-        """Test get_checker."""
-        self.assertIsInstance(self.application.get_checker('.php'),
-                              checkers.PHPChecker)
-        self.assertIsInstance(self.application.get_checker('.js'),
-                              checkers.JSChecker)
+        self.assertEqual(True, mocked_create_tools.called)
+        self.assertEqual(1, mocked_create_tools.call_count)
+        args, kwargs = mocked_create_tools.call_args
+        self.assertTupleEqual((), args)
+        self.assertDictEqual({}, kwargs)
 
-    def test_get_checker_forced_language(self):
-        """Test get_checker_forced_language."""
-        self.application.parameters_namespace.language = 'php'
-        # force language check
-        self.assertIsInstance(self.application.get_checker('.js'),
-                              checkers.PHPChecker)
-        self.assertIsInstance(self.application.get_checker('.php'),
-                              checkers.PHPChecker)
-
-    @mock.patch('codestyle.application.os')
-    def test_get_config_path(self, mock_os):
-        """Test get_config_path."""
-        self.application.get_config_path('file1')
-        standard_dir = self.application.get_standard_dir()
-        mock_os.path.join.assert_called_with(standard_dir, 'file1')
-
-    def test_parse_cmd_default_args(self):
-        """Test parse_cmd_args with default args."""
-        self.application.parse_cmd_args(['test.py'])
-        self.assertEqual(
-            self.application.parameters_namespace.target, ['test.py']
+        self.assertEqual(True, mock_debug_logger.called)
+        self.assertEqual(2, mock_debug_logger.call_count)
+        self.assertIn(
+            call('Разворачивание дерева файлов и директорий...'),
+            mock_debug_logger.mock_calls,
         )
-        self.assertIsInstance(
-            self.application.parameters_namespace, argparse.Namespace
-        )
-        self.assertFalse(self.application.parameters_namespace.compact)
-        self.assertIsInstance(
-            self.application.parameters_namespace.exclude, tuple
-        )
-        self.assertEqual(
-            len(self.application.parameters_namespace.exclude), 0
-        )
-        self.assertIsNone(self.application.parameters_namespace.language)
-        self.assertTrue(
-            os.path.isdir(self.application.parameters_namespace.standard)
+        self.assertIn(
+            call('Определение метода обработки файлов...'),
+            mock_debug_logger.mock_calls,
         )
 
-    def test_parse_cmd_args(self):
-        """Test parse_cmd_args."""
-        self.application.parse_cmd_args([
-            'test1.js', 'test2.html',
-        ])
-        self.assertEqual(self.application.parameters_namespace.target,
-                         ['test1.js', 'test2.html'])
-
-        self.application.parse_cmd_args(
-            ['-i', 'test.js']
-        )
-        self.assertTrue(self.application.parameters_namespace.fix)
-        self.application.parse_cmd_args(
-            ['--fix', 'test.js'])
-
-        self.application.parse_cmd_args(
-            ['-c', 'test.js'])
-        self.assertTrue(self.application.parameters_namespace.compact)
-        self.application.parse_cmd_args(
-            ['--compact', 'test.js'])
-        self.assertTrue(self.application.parameters_namespace.compact)
-
-        self.application.parse_cmd_args(
-            ['-l', 'html', 'test.xml'])
-        self.assertEqual(
-            self.application.parameters_namespace.language, 'html'
-        )
-        self.application.parse_cmd_args(
-            ['--language', 'html', 'test.xml'])
-        self.assertEqual(
-            self.application.parameters_namespace.language, 'html'
+        self.assertEqual(True, mocked_tree.called)
+        self.assertEqual(1, mocked_tree.call_count)
+        args, kwargs = mocked_tree.call_args
+        self.assertTupleEqual(('/code/test_dir/test_file.py',), args)
+        self.assertDictEqual(
+            {'excludes': ('/code/test_dir/test_exclude.py',)}, kwargs
         )
 
-        self.application.parse_cmd_args([
-            'test.php', '-x', '/test/dir/', '*.html'],
-        )
-        self.assertEqual(self.application.parameters_namespace.exclude,
-                         ['/test/dir/', '*.html'])
-        self.application.parse_cmd_args(
-            ['--exclude=/test/dir/', 'test.php'],
-        )
-        self.assertEqual(
-            self.application.parameters_namespace.exclude, ['/test/dir/']
+        self.assertEqual(True, mock_get_item.called)
+        self.assertEqual(1, mock_get_item.call_count)
+        args, kwargs = mock_get_item.call_args
+        self.assertTupleEqual(('fix',), args)
+        self.assertDictEqual({}, kwargs)
+
+    @patch.object(ConsoleApplication, 'logger', new=Mock(autospec=True))
+    @patch('codestyle.application.MESSAGES', new_callable=Mock)
+    @patch('codestyle.application.ExpandedPathTree', new=Mock(autospec=True))
+    @patch.object(
+        ConsoleApplication, '_ConsoleApplication__create_tools', new=Mock
+    )
+    @patch.object(ConsoleApplication, 'get_file_suffix_tools', new=Mock)
+    def test_init_with_check_method(self, mocked_messages: Mock):
+        """Проверка инициализации с check методом."""
+        mock_get_item = Mock()
+        mocked_messages.__getitem__ = mock_get_item
+
+        mock_parameters_storage = Mock(
+            target=('/code/test_dir/test_file.py',),
+            fix=False,
+            exclude=('/code/test_dir/test_exclude.py',),
         )
 
-        self.application.parse_cmd_args(
-            ['-q', 'test.php']
-        )
-        self.assertTrue(self.application.parameters_namespace.quiet)
+        ConsoleApplication(mock_parameters_storage)
 
-    def test_get_standard_dir(self):
-        """Check if default standard dir exists."""
-        self.assertTrue(
-            os.path.exists(self.application.get_standard_dir()),
+        self.assertEqual(True, mock_get_item.called)
+        self.assertEqual(1, mock_get_item.call_count)
+        args, kwargs = mock_get_item.call_args
+        self.assertTupleEqual(('check',), args)
+        self.assertDictEqual({}, kwargs)
+
+    @patch('codestyle.application.interrupt_program_flow', new_callable=Mock)
+    @patch.object(
+        ConsoleApplication,
+        '_ConsoleApplication__process_file',
+        new_callable=Mock,
+    )
+    @patch('codestyle.application.getattr', new_callable=Mock)
+    @patch('codestyle.application.ExpandedPathTree', new_callable=Mock)
+    @patch.object(ConsoleApplication, 'logger', new_callable=Mock)
+    @patch.object(ConsoleApplication, 'get_file_suffix_tools', new=Mock)
+    @patch.object(
+        ConsoleApplication, '_ConsoleApplication__create_tools', new=Mock
+    )
+    def test_process_files_with_unsuccessful(
+        self,
+        mocked_logger: Mock,
+        mocked_tree: Mock,
+        mocked_getattr: Mock,
+        mocked_process_file: Mock,
+        mocked_interrupt_program_flow: Mock,
+    ):
+        """Проверка process_files в случае неуспешной обработки."""
+        mock_info_logger = Mock()
+        mocked_logger.info = mock_info_logger
+
+        test_path = Path('test.py')
+        mock_iter = Mock(return_value=(path for path in [test_path]))
+        mocked_tree.return_value = Mock(
+            path_generator=Mock(__iter__=mock_iter)
         )
 
-    def test_log(self):
-        """Test log."""
-        buf_mock = mock.Mock()
-        self.application.log('Hello', buf=buf_mock)
-        buf_mock.write.assert_called_with('Hello\n')
-        buf_mock = mock.Mock()
-        self.application.log('Hello', newline=True,
-                             buf=buf_mock)
-        buf_mock.write.assert_called_with('Hello\n')
+        mocked_process_file.return_value = Mock(is_success=False)
 
-    @mock.patch('codestyle.application.sys.stderr')
-    def test_log_error(self, stderr_mock):
-        """Test log_error."""
-        self.application.log_error('Hello')
-        stderr_mock.write.assert_called_with('Hello\n')
-        self.application.log_error('Hello', False)
-        stderr_mock.write.assert_called_with('Hello')
+        mock_tool = Mock(autospec=True)
+        mock_get = Mock(return_value=[mock_tool])
+        application = ConsoleApplication(
+            Mock(fix=False, target=(), exclude=())
+        )
+        application._ConsoleApplication__file_suffix_tools = Mock(get=mock_get)
 
-    @mock.patch('codestyle.application.sys')
-    def test_exit_with_error(self, sys_mock):
-        """Test exit_with_error."""
-        self.application.exit_with_error(
-            'Test message',
+        application.process_files()
+
+        self.assertEqual(True, mock_info_logger.called)
+        self.assertIn(
+            call('Запуск обработки файлов...'), mock_info_logger.mock_calls
         )
-        sys_mock.exit.assert_called_with(1)
-        self.application.exit_with_error(
-            'Test message', 2,
+
+        self.assertEqual(True, mock_iter.called)
+        self.assertEqual(1, mock_iter.call_count)
+        args, kwargs = mock_iter.call_args
+        self.assertTupleEqual((), args)
+        self.assertDictEqual({}, kwargs)
+
+        self.assertEqual(True, mock_get.called)
+        self.assertEqual(1, mock_get.call_count)
+        args, kwargs = mock_get.call_args
+        self.assertTupleEqual(('.py', []), args)
+        self.assertDictEqual({}, kwargs)
+
+        self.assertEqual(True, mocked_getattr.called)
+        self.assertEqual(1, mocked_getattr.call_count)
+        args, kwargs = mocked_getattr.call_args
+        self.assertTupleEqual((mock_tool, 'check'), args)
+        self.assertDictEqual({}, kwargs)
+
+        self.assertEqual(True, mocked_process_file.called)
+        self.assertEqual(1, mocked_process_file.call_count)
+        args, kwargs = mocked_process_file.call_args
+        self.assertTupleEqual((test_path, mocked_getattr.return_value), args)
+        self.assertDictEqual({}, kwargs)
+
+        self.assertEqual(True, mocked_interrupt_program_flow.called)
+        self.assertEqual(1, mocked_interrupt_program_flow.call_count)
+        args, kwargs = mocked_interrupt_program_flow.call_args
+        self.assertTupleEqual((), args)
+        self.assertDictEqual(
+            {
+                'status': ExitCodes.UNSUCCESSFUL,
+                'log_message': '💔 Так-так-таак... Коллегам не стыдно в '
+                'глаза смотреть? Необходимо поправить '
+                'файлов: 1.',
+                'log_level': ERROR,
+            },
+            kwargs,
         )
-        sys_mock.stderr.write.assert_called_with(
-            f'{sys_mock.argv[0]}: Test message\n',
+
+    @patch('codestyle.application.interrupt_program_flow', new_callable=Mock)
+    @patch.object(
+        ConsoleApplication,
+        '_ConsoleApplication__process_file',
+        new=Mock(return_value=Mock(is_success=True)),
+    )
+    @patch('codestyle.application.getattr', new=Mock(autospec=True))
+    @patch.object(
+        ConsoleApplication,
+        'get_file_suffix_tools',
+        new=Mock(return_value={'.py': [Mock(autospec=True)]}),
+    )
+    @patch('codestyle.application.ExpandedPathTree', new_callable=Mock)
+    @patch.object(
+        ConsoleApplication, '_ConsoleApplication__create_tools', new=Mock
+    )
+    @patch.object(ConsoleApplication, 'logger', new=Mock(autospec=True))
+    def test_process_files_with_success(
+        self,
+        mocked_tree: Mock,
+        mocked_interrupt_program_flow: Mock,
+    ):
+        """Проверка process_files с успешным сценарием проверки."""
+        mocked_tree.return_value = Mock(
+            path_generator=Mock(
+                __iter__=Mock(
+                    return_value=(path for path in [Path('test.py')])
+                )
+            )
         )
-        sys_mock.exit.assert_called_with(2)
+
+        ConsoleApplication(
+            Mock(fix=False, target=(), exclude=())
+        ).process_files()
+
+        self.assertEqual(True, mocked_interrupt_program_flow.called)
+        self.assertEqual(1, mocked_interrupt_program_flow.call_count)
+        args, kwargs = mocked_interrupt_program_flow.call_args
+        self.assertTupleEqual((), args)
+        self.assertDictEqual(
+            {
+                'status': ExitCodes.SUCCESS,
+                'log_message': 'Я проверил твои файлы (1 шт.), можешь '
+                'не беспокоиться об их качестве. ✨ 💥',
+                'log_level': INFO,
+            },
+            kwargs,
+        )
+
+    @patch('codestyle.application.ExpandedPathTree', new=Mock())
+    @patch('codestyle.application.getLogger', new=Mock())
+    @patch.object(ConsoleApplication, 'get_file_suffix_tools', new=Mock())
+    @patch.object(
+        ConsoleApplication, '_ConsoleApplication__create_tools', new=Mock()
+    )
+    def test_tool_can_process(self):
+        """Проверки __tool_can_process метода в разных вариациях."""
+        application = ConsoleApplication(
+            Mock(autospec=True, fix=False, target=iter([]))
+        )
+
+        false_result = application._ConsoleApplication__tool_can_process(
+            Mock(for_check=False)
+        )
+        self.assertEqual(False, false_result)
+
+        false_result_without_error = (
+            application._ConsoleApplication__tool_can_process(
+                Mock(spec_set=True)
+            )
+        )
+        self.assertEqual(False, false_result_without_error)
+
+        true_result = application._ConsoleApplication__tool_can_process(
+            Mock(for_check=True)
+        )
+        self.assertEqual(True, true_result)
+
+    @patch('codestyle.application.ExpandedPathTree', new=Mock())
+    @patch('codestyle.application.getLogger', new=Mock())
+    @patch.object(ConsoleApplication, 'get_file_suffix_tools', new=Mock())
+    @patch.object(
+        ConsoleApplication, '_ConsoleApplication__create_tools', new=Mock()
+    )
+    def test_get_tool_configuration_path(self):
+        """Проверки __get_tool_configuration_path."""
+        mock_get_name = Mock(return_value='tool')
+        mock_wrapper = Mock(get_name=mock_get_name)
+        mock_path = Path('/mock-settings/')
+
+        application = ConsoleApplication(
+            Mock(
+                autospec=True,
+                fix=False,
+                target=iter([]),
+                tool_configuration=Path('settings.json'),
+            )
+        )
+        result = application._ConsoleApplication__get_tool_configuration_path(
+            mock_wrapper, mock_path
+        )
+
+        self.assertIsInstance(result, Path)
+        self.assertEqual(Path('/mock-settings/settings.json'), result)
+
+        self.assertEqual(True, mock_get_name.called)
+        self.assertEqual(1, mock_get_name.call_count)
+        args, kwargs = mock_get_name.call_args
+        self.assertTupleEqual((), args)
+        self.assertDictEqual({}, kwargs)

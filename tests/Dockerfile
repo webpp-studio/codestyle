@@ -1,22 +1,20 @@
-FROM python:3.6-slim-buster
-
-RUN apt-get -q update && \
-    apt-get -qy install --no-install-recommends curl && \
-    pip3 install tox && \
-    curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
-    apt-get -qy install --no-install-recommends python3.7 python3-distutils \
-        nodejs php-pear && \
-    pear channel-update pear.php.net && \
-    pear install PHP_CodeSniffer && \
-    rm -rf /var/lib/apt/lists/*
-
-COPY . /usr/src/app
-
-RUN cd /usr/src/app \
-    && mkdir -p /npm/node_modules \
-    && cat npm-deps.txt | xargs npm -g install \
-    && cd / && rm -rf /tmp/*
-
-
-WORKDIR /usr/src/app
-CMD ["tox"]
+FROM php:7.4.10-cli-alpine3.12
+WORKDIR /app
+RUN apk add --no-cache \
+        bzip2-dev coreutils dpkg-dev dpkg expat-dev findutils gcc gdbm-dev libc-dev libffi-dev libnsl-dev libtirpc-dev \
+        linux-headers make ncurses-dev openssl-dev pax-utils readline-dev sqlite-dev tcl-dev tk tk-dev util-linux-dev \
+        xz-dev zlib-dev yaml-dev git curl bash npm=12.18.4-r0 \
+    && curl https://pyenv.run | bash
+ENV HOME /root
+ENV PYENV_ROOT $HOME/.pyenv
+ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
+RUN pyenv install 3.6.12 && pyenv install 3.7.9 && pyenv install 3.8.6 && pyenv install 3.9.0 \
+    && pyenv global 3.6.12 3.7.9 3.8.6 3.9.0  \
+    && python3 -m pip --no-cache-dir install --upgrade pip \
+    && python3 -m pip --no-cache-dir install tox==3.20.0 PyYAML==5.3.1 \
+    && pear install --soft --onlyreqdeps PHP_CodeSniffer-3.5.6
+COPY . .
+RUN npm install \
+    && rm -r /tmp/*
+ENV PATH /app/node_modules/.bin/:$PATH
+CMD ["python", "-m", "tox"]
