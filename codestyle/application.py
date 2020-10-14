@@ -1,362 +1,162 @@
-#!/usr/bin/env python
-"""Code style checker application."""
-from __future__ import absolute_import
+"""Модуль с приложением."""
+from logging import ERROR, INFO, Logger, getLogger
+from pathlib import Path
+from typing import Callable, Dict, List
 
-import argparse
-import fnmatch
-import glob
-import os
-import re
-import sys
-from builtins import object, str
-from configparser import ConfigParser
+from codestyle.code_path import ExpandedPathTree
+from codestyle.parameters_parse import ParametersStorage
+from codestyle.system_wrappers import ExitCodes, interrupt_program_flow
+from codestyle.tool_wrappers import (Autoflake, Autopep8, ConsoleTool, ESLint,
+                                     Flake8, HTMLCS, PHPCBF, PHPCS, Result,
+                                     TOOL_SETTINGS_PATH, Stylelint)
 
-from codestyle import checkers, settings
-from codestyle.settings import (DEFAULT_STANDARD_DIR,
-                                PROJECT_INITIALIZATION_PATH)
-from codestyle.utils import DependencyError, check_external_deps
+FIX_SUCCESS = 'Твой код просто огонь!💥 Мне не пришлось ничего исправлять.'
+FIX_UNSUCCESSFUL = ('Проверено файлов - {total_count}, из них было '
+                    'исправлено - {total_failed}.')
+CHECK_SUCCESS = ('Я проверил твои файлы ({total_count} шт.), можешь не '
+                 'беспокоиться об их качестве. ✨ 💥')
+CHECK_UNSUCCESSFUL = ('💔 Так-так-таак... Коллегам не стыдно в глаза '
+                      'смотреть? Необходимо поправить файлов: '
+                      '{total_failed}.')
+MESSAGES = {'fix': {ExitCodes.SUCCESS: FIX_SUCCESS,
+                    ExitCodes.UNSUCCESSFUL: FIX_UNSUCCESSFUL},
+            'check': {ExitCodes.SUCCESS: CHECK_SUCCESS,
+                      ExitCodes.UNSUCCESSFUL: CHECK_UNSUCCESSFUL}}
+ENABLED_TOOLS = (Flake8, Autopep8, Autoflake, ESLint, PHPCS, PHPCBF, HTMLCS,
+                 Stylelint)
 
 
-class Application(object):  # noqa: WPS214, WPS230, WPS338 todo fix
-    """Codestyle checker application class."""
+class ConsoleApplication:
+    """Консольное приложение."""
 
-    # Checker classmap
-    checkers_map = (
-        ('.php', checkers.PHPChecker),
-        (('.js', '.vue', '.ts', '.coffee'), checkers.JSChecker),
-        ('.py', checkers.PythonChecker),
-        (('.css', '.less'), checkers.LessChecker),
-        ('.html', checkers.HTMLChecker),
-    )
+    logger: Logger = getLogger(__name__)
 
-    def __init__(self):
-        """Init Application with attributes."""
-        self.params = None
-        self.settings = settings
-        self.parameters_namespace = argparse.Namespace(
-            standard=self.settings.DEFAULT_STANDARD_DIR,
-        )
-        self.checkers = None
-        self.excludes = '$.'
-        self.argument_parser = argparse.ArgumentParser(
-            description=str(self.__doc__),
-        )
-        self.boolean_arguments = None
-        self.config_parser = ConfigParser()
-
-        self._add_arguments()
-
-    def _add_arguments(self):
-        """Declare ArgumentParser's arguments."""
-        self.boolean_arguments = ('fix', 'compact', 'quiet')
-        self.argument_parser.add_argument(
-            'target', metavar='target', type=str, nargs='*',
-            help='files for checking', default='.',
-        )
-        self.argument_parser.add_argument(
-            '-i', '--fix', dest='fix', action='store_true',
-            help='auto fix codestyle errors if possible', default=False,
-        )
-        self.argument_parser.add_argument(
-            '-c', '--compact', dest='compact', action='store_true',
-            help='Show a compact output', default=False,
-        )
-        self.argument_parser.add_argument(
-            '-s', '--standard', dest='standard', type=str,
-            help='A path to a coding standard directory',
-            default=DEFAULT_STANDARD_DIR, metavar='standard-dir',
-        )
-        self.argument_parser.add_argument(
-            '-l', '--language', dest='language', type=str,
-            help='force set the language for a checking',
-            metavar='language name', default=None,
-        )
-        self.argument_parser.add_argument(
-            '-x', '--exclude', dest='exclude', type=str,
-            help='Exclude paths/files from checking', metavar='glob pattern',
-            nargs='+', default=(),
-        )
-        self.argument_parser.add_argument(
-            '-q', '--quiet', dest='quiet', action='store_true', default=False,
-            help='Quiets "Processing" message and warnings',
-        )
-
-    def _build_config_parser_cli_arguments(self) -> list:
+    def __init__(self, parameters_storage: ParametersStorage):
         """
-        Iterate ConfigParser's parameters.
+        Подготовка приложения к выполнению.
 
-        return: list view as CLI arguments.
+        :param parameters_storage: Хранилище параметров, извлечённых из
+            командной строки и/или файла конфигурации.
         """
-        cli_arguments = []
-        parameters = self.get_config_parser_parameters()
-        target_arguments = parameters.pop(
-            'target', str(PROJECT_INITIALIZATION_PATH.parent),
-        ).split(' ')
-        for parameter_name in parameters.keys():
-            if parameter_name in self.boolean_arguments:
-                if parameters[parameter_name] == 'true':
-                    cli_arguments.append(f'--{parameter_name}')
-            else:
-                parameter_value = parameters[parameter_name]
-                cli_arguments.append(f'--{parameter_name}={parameter_value}')
-        cli_arguments.extend(target_arguments)
-        return cli_arguments
+        self.__parameters_storage = parameters_storage
+        method = 'fix' if self.__parameters_storage.fix else 'check'
+        self.__process_method = method
+        tools = self.__create_tools()
+        self.__file_suffix_tools = self.get_file_suffix_tools(tools)
 
-    def _build_parameters_data(self, parameter: str = None) -> dict:
-        """Extract ConfigParser's non empty parameters."""
-        parameters_data = {}
-        parameters = self.config_parser['parameters']
-        if parameter and parameter in self.config_parser['parameters']:
-            parameters_data.update({
-                parameter.lower(): parameters[parameter].strip(),
-            })
-            return parameters_data
+        self.logger.debug('Разворачивание дерева файлов и директорий...')
+        path_tree = ExpandedPathTree(
+            *self.__parameters_storage.target,
+            excludes=self.__parameters_storage.exclude)
+        self.__path_generator = path_tree.path_generator
 
-        for parameter_name in filter(None, self.config_parser['parameters']):
-            parameters_data.update({
-                parameter_name.lower(): self.sanitize(
-                    parameters[parameter_name],
-                ),
-            })
+        self.logger.debug('Определение метода обработки файлов...')
+        self.__status_messages = MESSAGES[self.__process_method]
 
-        return parameters_data
+    def process_files(self):
+        """Обработка файлов."""
+        self.logger.info('Запуск обработки файлов...')
 
-    @staticmethod
-    def sanitize(value: str):
-        """
-        Clean and sanitize input data.
-
-        :param value: parameter value
-        :return: mixed
-        """
-        value = value.strip()
-
-        # String covert to boolean
-        if value.lower() in ('yes', 'true', 't', 'y', '1'):
-            return True
-        if value.lower() in ('no', 'false', 'f', 'n', '0'):
-            return False
-
-        return value
-
-    def get_config_parser_parameters(self, argument_name: str = None) -> dict:
-        """Read project's initialization file and return parameters."""
-        if self.settings.PROJECT_INITIALIZATION_PATH.is_file():
-            self.config_parser.read(PROJECT_INITIALIZATION_PATH)
-        if 'parameters' not in self.config_parser:
-            return {}
-        if argument_name:
-            return self._build_parameters_data(argument_name)
-        return self._build_parameters_data()
-
-    def create_checkers(self):
-        """Create checker instances for extensions."""
-        self.checkers = {}
-        for ext, checker_class in self.checkers_map:
-            if not issubclass(checker_class, checkers.BaseChecker):
-                raise TypeError('expected BaseChecker subclass')
-            checker_instance = checker_class(application=self)
-            if isinstance(ext, (list, tuple)):
-                for ex in ext:
-                    self.checkers[ex] = checker_instance
-            else:
-                self.checkers[ext] = checker_instance
-
-    def get_checkers(self):
-        """Get all checker instances for extensions."""
-        if self.checkers is None:
-            self.create_checkers()
-        return self.checkers
-
-    def get_checker(self, extension):
-        """Get checker instance by extension."""
-        checkers_data = self.get_checkers()
-        if self.parameters_namespace.language:  # forced language
-            return checkers_data.get(
-                f'.{self.parameters_namespace.language}', None,
-            )
-        return checkers_data.get(extension, None)
-
-    def get_config_path(self, filename):
-        """Get path of the config file by name."""
-        return os.path.join(self.get_standard_dir(), filename)
-
-    def parse_cmd_args(self, args=None):
-        """Get parsed command line arguments."""
-        cli_params = self.argument_parser.parse_args(
-            args, namespace=self.parameters_namespace,
-        )
-
-        self.params = self.__join_with_config_params(cli_params)
-
-    def __join_with_config_params(self, cli_params):
-        """
-        Replace cli params with config file based ones.
-
-        Cli params have more priority.
-        :param cli_params:
-        :return: void
-        """
-        config_params = self.get_config_parser_parameters()
-        for param in config_params:
-            # Rewrite default '.' target
-            if param == 'target' and cli_params.target == ['.']:
-                setattr(cli_params, param, config_params[param])
-
-            if not getattr(cli_params, param):
-                setattr(cli_params, param, config_params[param])
-
-        return cli_params
-
-    def check_force_language(self):
-        """Check for selected language."""
-        if not self.params.language:
-            return
-        checker_map = self.get_checkers()
-        ext = '.' + self.params.language.lower()
-        if ext not in checker_map:
-            keys = [key for key in list(checker_map.keys())]
-            self.exit_with_error(
-                f'Unsupported language: {self.params.language}\n'
-                'Supported extensions: '
-                f'{", ".join(keys)}',
-            )
-
-    def get_standard_dir(self):
-        """Get a path of a coding standard directory."""
-        return self.parameters_namespace.standard
-
-    def log(self, string, newline=True, buf=sys.stdout):
-        """Log a message to the STDOUT."""
-        if newline:
-            string += '\n'
-        buf.write(string)
-
-    def log_error(self, string, newline=True):
-        """Log an error message to the STDERR."""
-        self.log(string, newline, sys.stderr)
-
-    def exit_with_error(self, message, retcode=1):
-        """Put an error message to the STDERR and exit."""
-        self.log_error(f'{sys.argv[0]}: {message}')
-        sys.exit(retcode)
-
-    def process_file(self, path):
-        """Process a file (to check or pass it)."""
-        checker = self.get_checker(os.path.splitext(path)[1])
-        if checker is None:
-            return None
-
-        if not self.parameters_namespace.quiet:
-            self.log('Processing: ' + path + '...')
-
-        result = None
-        if self.parameters_namespace.fix:
-            try:
-                result = self.__auto_fix_errors(checker, path)
-            except NotImplementedError:
-                self.log_error(
-                    'Auto fixing is not supported for this language\n',
-                )
-        else:
-            result = checker.check(path)
-            if self.parameters_namespace.compact:
-                if result.is_success():
-                    self.log(' Done')
-                else:
-                    self.log(' Fail')
-            elif result.output and not self.parameters_namespace.quiet:
-                self.log('\n')
-
-        return result
-
-    def __auto_fix_errors(self, checker, path):
-        result = checker.fix(path)
-        if self.parameters_namespace.compact:
-            res = 'Some' if result.is_success() else 'No'
-            self.log(res + ' errors has been fixed\n')
-        return result
-
-    def process_dir(self, path):
-        """Check code in directory (recursive)."""
-        for root, _folders, files in os.walk(path):
-            for file in files:
-                full_path = os.path.join(root, file)
-                if not re.search(self.excludes, full_path):
-                    yield self.process_file(full_path)
-
-    def process_path(self, path):
-        """Check file or directory (recursive)."""
-        files = glob.glob(path)
-        if not files:
-            self.exit_with_error(f'No such file or directory: {path}')
-
-        for file in files:
-            if os.path.isfile(file):
-                if not re.match(self.excludes, file):
-                    yield self.process_file(file)
-            elif os.path.isdir(file):
-                for result in self.process_dir(file):
-                    yield result
-
-    def run(self):
-        """Run a code checking."""
-        self.parse_cmd_args()
-
-        self.check_force_language()
-
-        self.set_excludes()
-
-        try:
-            check_external_deps()
-        except DependencyError as ex:
-            self.log_error(str(ex))
-            sys.exit(1)
-
-        self.check_files()
-
-        sys.exit()
-
-    def check_files(self):
-        """
-        Run file checking.
-
-        :return:
-        """
-        total_success = 0
-        total_failed = 0
-        if isinstance(self.parameters_namespace.target, list):
-            target = self.parameters_namespace.target
-        else:
-            target = self.parameters_namespace.target.split()
-
-        for path in target:
-            for result in self.process_path(path):
-                if result is None:
-                    continue
-                if result.is_success():
+        total_success = total_failed = 0
+        status, log_level = ExitCodes.SUCCESS, INFO
+        for path in self.__path_generator:
+            for tool in self.__file_suffix_tools.get(path.suffix, []):
+                process_method = getattr(tool, self.__process_method)
+                result = self.__process_file(path, process_method)
+                if result.is_success:
                     total_success += 1
                 else:
                     total_failed += 1
-        self.log(f'Total success: {total_success}')
-        self.log(f'Total failed: {total_failed}')
         if total_failed > 0:
-            sys.exit(1)
+            status, log_level = ExitCodes.UNSUCCESSFUL, ERROR
 
-    def set_excludes(self):
+        message = self.__status_messages[status].format(
+            total_count=(total_failed + total_success),
+            total_failed=total_failed)
+        interrupt_program_flow(status=status, log_message=message,
+                               log_level=log_level)
+
+    def __create_tools(self) -> List[ConsoleTool]:
+        """Создание инструментов для обработки файлов."""
+        self.logger.debug(f'{self.__create_tools.__doc__}..')
+        tools = []
+        for tool in ENABLED_TOOLS:
+            tool = tool(**self.__get_tool_kwargs(tool))
+            if self.__tool_can_process(tool):
+                tools.append(tool)
+        return tools
+
+    def __tool_can_process(self, tool: ConsoleTool) -> bool:
+        """Проверка возможностей указанного инструмента."""
+        return getattr(tool, f'for_{self.__process_method}', False)
+
+    def __process_file(self, file_path: Path,
+                       process_method: Callable) -> Result:
         """
-        Parse excludes, translate them into regexp.
+        Обработка указанного файла с переданным методом.
 
-        :return: void
+        :param file_path: Путь обрабатываемого файла.
+        :param process_method: Метод обработки (fix() / check()).
+        :return: Результат обработки файла.
         """
-        # Exclude from config file loads as string
-        if isinstance(self.params.exclude, str):
-            self.params.exclude = self.params.exclude.split(' ')
+        self.logger.info(f'Обработка {file_path}..')
+        result = process_method(str(file_path))
 
-        self.excludes = r'|'.join(
-            [fnmatch.translate(exclude) for exclude in self.params.exclude],
-        ) or r'$.'
+        if result.whole_output:
+            level = INFO if result.is_success else ERROR
+            self.logger.log(level, result.whole_output)
+        return result
 
+    @staticmethod
+    def get_file_suffix_tools(
+            tools: List[ConsoleTool]) -> Dict[str, List[ConsoleTool]]:
+        """
+        Создание словаря с расширениями файлов.
 
-if __name__ == '__main__':
-    Application().run()
+        :param tools: набор утилит
+        :return: словарь с расширениями, каждому из которых
+            соответствует свой набор поддерживаемых утилит
+        """
+        file_suffix_tools = {}
+        for tool in tools:
+            for suffix in tool.supported_file_suffixes:
+                if file_suffix_tools.get(suffix):
+                    file_suffix_tools[suffix].append(tool)
+                    continue
+                file_suffix_tools[suffix] = [tool]
+        return file_suffix_tools
+
+    def __get_tool_kwargs(self, tool_wrapper) -> dict:
+        """
+        Определение kwarg'ов для инициализации инструмента.
+
+        :param tool_wrapper: Инструмент.
+        :return: Словарь с kwarg'ами.
+        """
+        tool_kwargs = {'configuration_path': None}
+
+        if self.__parameters_storage.settings != TOOL_SETTINGS_PATH:
+            configuration_path = self.__get_tool_configuration_path(
+                tool_wrapper, self.__parameters_storage.settings)
+            tool_kwargs.update({'configuration_path': str(configuration_path)})
+
+        tool_name = tool_wrapper.cli_tool_name
+        if tool_name in ('phpcs', 'phpcbf'):
+            tool_kwargs.update(
+                {'encoding': self.__parameters_storage.phpcs_encoding})
+
+        return tool_kwargs
+
+    def __get_tool_configuration_path(self, tool_wrapper,
+                                      settings_path: Path) -> Path:
+        """
+        Определение пути к конфигурации для указанного инструмента.
+
+        :param tool_wrapper: Инструмент.
+        :param settings_path: Путь до установленных стандартов.
+        :return: Путь к конфигурации.
+        """
+        storage_configuration = getattr(
+            self.__parameters_storage,
+            tool_wrapper.get_name() + '_configuration')
+        return settings_path / storage_configuration

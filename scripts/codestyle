@@ -1,5 +1,0 @@
-"""Codestyle script."""
-
-from codestyle.application import Application
-
-Application().run()

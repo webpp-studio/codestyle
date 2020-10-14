@@ -1,0 +1,16 @@
+version: '3.7'
+services:
+  cli-tool:
+    build: .
+    environment:
+      PATH: /app/node_modules/.bin/:$PATH
+    volumes:
+      - ./codestyle:/app/codestyle
+  test:
+    build:
+      context: .
+      dockerfile: tests/Dockerfile
+    volumes:
+      - ./codestyle:/app/codestyle
+      - ./tests:/app/tests
+      - ./tox.ini:/app/tox.ini

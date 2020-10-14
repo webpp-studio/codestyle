@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "eslint": "6.8.0",
+    "eslint-plugin-vue": "6.2.2",
+    "eslint-plugin-jsdoc": "30.5.1",
+    "eslint-plugin-strict-vue": "1.0.0",
+    "htmlcs": "0.4.1",
+    "stylelint": "13.7.1"
+  },
+  "private": true
+}
