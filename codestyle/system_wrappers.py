@@ -36,7 +36,7 @@ def check_output(run_arguments: tuple) -> Optional[str]:
         return check_process_output(run_arguments,  # noqa: S603
                                     timeout=10).decode().rstrip()
     except (CalledProcessError, FileNotFoundError, TimeoutExpired) as error:
-        _logger.debug(f'Инструмент {tool_name} не найден.')
+        _logger.warning(f'Инструмент {tool_name} не найден.')
         _logger.debug(str(error))
 
         interrupt_program_flow(ExitCodes.UNSUCCESSFUL)
