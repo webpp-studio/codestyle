@@ -94,7 +94,9 @@ class Test(TestCase):
     ):
         """Проверка check_output с ошибкой внутри."""
         mock_debug = Mock()
+        mock_warning = Mock()
         mocked_logger.debug = mock_debug
+        mocked_logger.warning = mock_warning
 
         mocked_process_output_checker.side_effect = FileNotFoundError(
             'Исполняемый файл application не найден.'
@@ -103,13 +105,14 @@ class Test(TestCase):
         check_output(('application', 'run'))
 
         self.assertEqual(True, mock_debug.called)
-        self.assertEqual(3, mock_debug.call_count)
+        self.assertEqual(2, mock_debug.call_count)
+        self.assertEqual(1, mock_warning.call_count)
         self.assertIn(
             call('Проверка наличия application в системе...'),
             mock_debug.mock_calls,
         )
         self.assertIn(
-            call('Инструмент application не найден.'), mock_debug.mock_calls
+            call('Инструмент application не найден.'), mock_warning.mock_calls
         )
         self.assertIn(
             call('Исполняемый файл application не найден.'),
