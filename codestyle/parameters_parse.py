@@ -3,7 +3,7 @@ from os import linesep
 from pathlib import Path
 from typing import Tuple
 
-from configargparse import ArgumentParser, Namespace
+from configargparse import ArgumentParser, Namespace, DefaultConfigFileParser
 
 from codestyle import (__name__ as application_name,
                        __description__ as application_description)
@@ -55,9 +55,11 @@ class ArgumentationTool:
         """Подготовка инструмента для работы с параметрами."""
         self.__argument_parser = ArgumentParser(
             add_env_var_help=False,
+            config_file_parser_class=DefaultConfigFileParser,
             default_config_files=self.DEFAULT_CONFIG_FILES,
             prog=application_name,
             description=application_description)
+
         self.__define_parameters()
         self.parameters_storage, _ = self.__argument_parser.parse_known_args(
             namespace=ParametersStorage())
