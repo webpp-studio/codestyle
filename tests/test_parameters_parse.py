@@ -52,6 +52,8 @@ class TestParametersStorage(TestCase):
 class TestArgumentationTool(TestCase):
     """Проверки ArgumentationTool."""
 
+    @patch('codestyle.parameters_parse.DefaultConfigFileParser',
+           new_callable=Mock)
     @patch('codestyle.parameters_parse.ParametersStorage', new_callable=Mock)
     @patch.object(
         ArgumentationTool,
@@ -72,6 +74,7 @@ class TestArgumentationTool(TestCase):
         mocked_application_description: Mock,
         mocked_define_parameters: Mock,
         mocked_storage: Mock,
+        mocked_config_file_parser_class: Mock,
     ):
         """Проверка инициализации."""
         mock_parse = Mock(return_value=('storage', 'unknown arguments'))
@@ -89,6 +92,7 @@ class TestArgumentationTool(TestCase):
                 'default_config_files': mocked_config_files,
                 'prog': mocked_application_name,
                 'description': mocked_application_description,
+                'config_file_parser_class': mocked_config_file_parser_class,
             },
             kwargs,
         )

@@ -28,7 +28,7 @@
                                                              (по умолчанию: ./tool_settings)
 --file_suffix <file suffix>                                  Проверяемое расширение файлов
                                                              (.py, .js и так далее; по-умолчанию: все расширения)
--x <globbing шаблон ...>, --exclude <globbing шаблон ...>    Исключить по указанному globbing шаблону
+-x <globbing шаблон ...>, --exclude <globbing шаблон ...>    Исключить по указанному globbing шаблону, для файла необходимо указывать список exclude = [file1, file2, ...]
 --phpcs-encoding PHPCS_ENCODING                              Кодировка для PHP_CodeSniffer (по-умолчанию: utf-8)
 --stylelint-configuration_name STYLELINT_CONFIGURATION       Имя файла конфигурации для stylelint утилиты
                                                              (по-умолчанию: .stylelintsrc.json)
