@@ -30,6 +30,8 @@ gitdb==4.0.5
 GitPython==3.1.8
 mando==0.6.4
 mccabe==0.6.1
+mypy==0.790
+mypy-extensions==0.4.3
 pbr==5.5.0
 pep8-naming==0.11.1
 pycodestyle==2.6.0

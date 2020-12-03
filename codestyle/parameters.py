@@ -9,7 +9,7 @@ from pathlib import Path
 
 from codestyle import __version__ as application_version
 from codestyle.tool_wrappers import (ESLint, Flake8, HTMLCS, PHPCBF, PHPCS,
-                                     Stylelint, TOOL_SETTINGS_PATH)
+                                     Stylelint, TOOL_SETTINGS_PATH, MyPy)
 
 PARAMETERS: tuple = (
     (
@@ -130,6 +130,16 @@ PARAMETERS: tuple = (
             'help': 'Имя файла конфигурации для flake8 утилиты '
             '(по-умолчанию: '
             f'{Flake8.configuration_file_name})',
+        },
+    ),
+    (
+        ('-m', '--mypy'),
+        {
+            'dest': MyPy.optional_flag,
+            'action': 'store_true',
+            'help': 'Имя файла конфигурации для mypy утилиты '
+                    '(по-умолчанию: '
+                    f'{MyPy.configuration_file_name})',
         },
     ),
     (

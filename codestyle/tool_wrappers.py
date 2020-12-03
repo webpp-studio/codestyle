@@ -83,6 +83,10 @@ class ConsoleTool:
     for_check: bool = False
     for_fix: bool = False
 
+    # Флаг для выбора дополнительной проверки кода.
+    optional: bool = False
+    optional_flag: str = None
+
     def __init__(self, configuration_path: Path = None):
         """
         Проверка доступности приложения в запускаемой среде.
@@ -137,7 +141,7 @@ class Flake8(ConsoleTool):
     """
     flake8 утилита для проверки python кода.
 
-    https://gitlab.com/pycqa/flake8.
+    .. seealso:: https://gitlab.com/pycqa/flake8
     """
 
     configuration_file_name = 'flake8.conf'
@@ -150,7 +154,7 @@ class Autopep8(ConsoleTool):
     """
     autopep8 утилита для форматирования python кода.
 
-    https://github.com/hhatto/autopep8.
+    .. seealso:: https://github.com/hhatto/autopep8
     """
 
     configuration_argument = None
@@ -163,7 +167,7 @@ class Autoflake(ConsoleTool):
     """
     autoflake утилита для удаления неиспользуемых импортов в python.
 
-    https://github.com/myint/autoflake.
+    .. seealso:: https://github.com/myint/autoflake
     """
 
     configuration_argument = None
@@ -172,11 +176,25 @@ class Autoflake(ConsoleTool):
     for_fix = True
 
 
+class MyPy(ConsoleTool):
+    """
+    Mypy утилита для проверки типов в python коде.
+
+    .. seealso:: https://github.com/python/mypy
+    """
+    configuration_file_name = 'mypy.conf'
+    configuration_path = TOOL_SETTINGS_PATH / configuration_file_name
+    supported_file_suffixes = ('.py',)
+    for_check = True
+    optional = True
+    optional_flag = 'mypy'
+
+
 class ESLint(ConsoleTool):
     """
     Ищет и исправляет проблемы в JavaScript коде.
 
-    https://eslint.org.
+    .. seealso:: https://eslint.org
     """
 
     NPM_ROOT: str = check_output(('npm', 'root'))
@@ -198,7 +216,7 @@ class _PHPCodeSniffer(ConsoleTool):
     Используется для создания (наследованием) phpcs (проверка файлов) и
     phpcbf (проверка и исправление файлов) утилит.
 
-    https://github.com/squizlabs/PHP_CodeSniffer.
+    .. seealso:: https://github.com/squizlabs/PHP_CodeSniffer
     """
 
     configuration_argument = '--standard='
@@ -232,7 +250,7 @@ class HTMLCS(ConsoleTool):
     """
     Инструмент проверки и форматирования html файлов.
 
-    https://github.com/ecomfe/htmlcs.
+    .. seealso:: https://github.com/ecomfe/htmlcs
     """
 
     configuration_file_name = 'htmlcs.json'
@@ -247,7 +265,7 @@ class Stylelint(ConsoleTool):
     """
     Инструмент проверки и форматирования css-подобных языков.
 
-    https://stylelint.io.
+    .. seealso:: https://stylelint.io
     """
 
     configuration_file_name = '.stylelintsrc.json'
