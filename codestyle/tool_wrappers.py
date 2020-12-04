@@ -190,6 +190,20 @@ class MyPy(ConsoleTool):
     optional_flag = 'mypy'
 
 
+class Black(ConsoleTool):
+    """
+    Black утилита для форматирования python кода.
+
+    .. seealso:: https://black.readthedocs.io/en/stable/
+    """
+    configuration_file_name = 'black.cfg'
+    configuration_path = TOOL_SETTINGS_PATH / configuration_file_name
+    supported_file_suffixes = ('.py',)
+    for_fix = True
+    optional = True
+    optional_flag = 'black'
+
+
 class ESLint(ConsoleTool):
     """
     Ищет и исправляет проблемы в JavaScript коде.

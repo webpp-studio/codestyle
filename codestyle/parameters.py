@@ -9,7 +9,8 @@ from pathlib import Path
 
 from codestyle import __version__ as application_version
 from codestyle.tool_wrappers import (ESLint, Flake8, HTMLCS, PHPCBF, PHPCS,
-                                     Stylelint, TOOL_SETTINGS_PATH, MyPy)
+                                     Stylelint, TOOL_SETTINGS_PATH,
+                                     MyPy, Black)
 
 PARAMETERS: tuple = (
     (
@@ -140,6 +141,16 @@ PARAMETERS: tuple = (
             'help': 'Имя файла конфигурации для mypy утилиты '
                     '(по-умолчанию: '
                     f'{MyPy.configuration_file_name})',
+        },
+    ),
+    (
+        ('-b', '--black'),
+        {
+            'dest': Black.optional_flag,
+            'action': 'store_true',
+            'help': 'Имя файла конфигурации для mypy утилиты '
+                    '(по-умолчанию: '
+                    f'{Black.configuration_file_name})',
         },
     ),
     (
