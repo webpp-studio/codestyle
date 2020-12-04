@@ -6,15 +6,9 @@ from unittest.mock import Mock, call, patch
 
 from codestyle import __version__ as application_version
 from codestyle.parameters_parse import ArgumentationTool, ParametersStorage
-from codestyle.tool_wrappers import (
-    ESLint,
-    Flake8,
-    HTMLCS,
-    PHPCBF,
-    PHPCS,
-    Stylelint,
-    TOOL_SETTINGS_PATH, MyPy,
-)
+from codestyle.tool_wrappers import (ESLint, Flake8, HTMLCS, PHPCBF, PHPCS,
+                                     Stylelint, TOOL_SETTINGS_PATH,
+                                     MyPy, Black)
 
 
 class TestParametersStorage(TestCase):
@@ -124,7 +118,7 @@ class TestArgumentationTool(TestCase):
         ArgumentationTool()
 
         self.assertEqual(True, mock_add_argument.called)
-        self.assertEqual(17, mock_add_argument.call_count)
+        self.assertEqual(18, mock_add_argument.call_count)
         parameter_calls = [
             call(
                 'target',
@@ -231,6 +225,16 @@ class TestArgumentationTool(TestCase):
                      '(по-умолчанию: '
                      f'{MyPy.configuration_file_name})',
             ),
+            call(
+                '-b',
+                '--black',
+                action='store_true',
+                dest=Black.optional_flag,
+                help='Имя файла конфигурации для mypy утилиты '
+                     '(по-умолчанию: '
+                     f'{Black.configuration_file_name})',
+            ),
+
             call(
                 '--htmlcs-configuration_name',
                 default=HTMLCS.configuration_file_name,
