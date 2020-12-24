@@ -233,11 +233,12 @@ class _PHPCodeSniffer(ConsoleTool):
     .. seealso:: https://github.com/squizlabs/PHP_CodeSniffer
     """
 
-    configuration_argument = '--standard='
+    configuration_argument = None
     configuration_file_name = 'phpcs.xml'
     configuration_path = TOOL_SETTINGS_PATH / configuration_file_name
     encoding = 'utf-8'
-    extra_run_arguments = ['--runtime-set', 'ignore_warnings_on_exit', 'true']
+    extra_run_arguments = [f'--standard={configuration_path}',
+                           '--runtime-set', 'ignore_warnings_on_exit', 'true']
     supported_file_suffixes = ('.inc', '.php', '.js', '.css')
 
     def __init__(self, encoding: str = encoding, **kwargs):
