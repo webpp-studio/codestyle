@@ -5,7 +5,7 @@ RUN apk add --no-cache \
         linux-headers make ncurses-dev openssl-dev pax-utils readline-dev sqlite-dev tcl-dev tk tk-dev util-linux-dev \
         xz-dev zlib-dev yaml-dev git curl bash npm=12.20.1-r0 \
     && curl https://pyenv.run | bash
-ENV HOME /rootр
+ENV HOME /root
 ENV PYENV_ROOT $HOME/.pyenv
 ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
 RUN pyenv install 3.6.12 && pyenv install 3.7.9 && pyenv install 3.8.6 && pyenv install 3.9.0 \
