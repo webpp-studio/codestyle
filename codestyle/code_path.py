@@ -3,7 +3,8 @@ from logging import CRITICAL, getLogger
 from pathlib import Path
 from typing import Generator, Iterable
 
-from codestyle.system_wrappers import ExitCodes, interrupt_program_flow
+
+_logger = getLogger(__name__)
 
 
 class ExpandedPathTree:
@@ -37,9 +38,7 @@ class ExpandedPathTree:
         getLogger(__name__).info('Проверяю какие тут пути ты мне указал...')
         missing_paths = filter(lambda path: not path.exists(), paths)
         for path in missing_paths:
-            interrupt_program_flow(status=ExitCodes.UNSUCCESSFUL,
-                                   log_message=f'Путь {path} недоступен.',
-                                   log_level=CRITICAL)
+            _logger.log(CRITICAL, f'Путь {path} недоступен.')
 
     def __is_excluded(self, path: Path) -> bool:
         """Проверка исключён путь или нет."""
@@ -59,6 +58,6 @@ class ExpandedPathTree:
             return
         if path.is_file():
             yield path
-        else:
+        elif path.is_dir():
             for directory_child in path.iterdir():
                 yield from self.__generate_paths(directory_child)
