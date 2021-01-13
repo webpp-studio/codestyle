@@ -4,9 +4,7 @@ from unittest import TestCase
 from unittest.mock import Mock, call, patch
 
 from codestyle import code_path
-
 from codestyle.code_path import ExpandedPathTree
-from codestyle.system_wrappers import ExitCodes
 
 
 class TestExpandedPathTree(TestCase):
@@ -99,21 +97,7 @@ class TestExpandedPathTree(TestCase):
 
         self.assertEqual(True, result)
 
-    @patch('codestyle.code_path.interrupt_program_flow', new_callable=Mock)
-    def test_check_path_availability_with_empty_missing_paths(
-        self, mocked_interrupt: Mock
-    ):
-        """Проверка метода с пустым набором отсутствующих путей."""
-        ExpandedPathTree.check_path_availability(
-            [Mock(exists=Mock(return_value=True))]
-        )
-
-        self.assertEqual(False, mocked_interrupt.called)
-
-    @patch('codestyle.code_path.interrupt_program_flow', new_callable=Mock)
-    def test_check_path_availability_with_missing_paths(
-        self, mocked_interrupt: Mock
-    ):
+    def test_check_path_availability_with_missing_paths(self):
         """Проверка метода с набором отсутствующих путей."""
         mock_exists = Mock(return_value=False)
         mock_str = Mock(return_value='/mock-path/')
@@ -128,19 +112,6 @@ class TestExpandedPathTree(TestCase):
             'INFO:codestyle.code_path:Проверяю какие тут пути ты мне '
             'указал...',
             context_manager.output,
-        )
-
-        self.assertEqual(True, mocked_interrupt.called)
-        self.assertEqual(len(mock_paths), mocked_interrupt.call_count)
-        args, kwargs = mocked_interrupt.call_args
-        self.assertTupleEqual((), args)
-        self.assertDictEqual(
-            {
-                'status': ExitCodes.UNSUCCESSFUL,
-                'log_message': 'Путь /mock-path/ недоступен.',
-                'log_level': 50,
-            },
-            kwargs,
         )
 
     @patch.object(
