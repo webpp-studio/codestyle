@@ -8,7 +8,7 @@ from codestyle import (__version__ as version,
                        __url__ as url)
 
 
-with open('README.rst', encoding='utf-8') as readme_file:
+with open('README.md', encoding='utf-8') as readme_file:
     long_description = readme_file.read()
 
 with open('requirements.txt', encoding='utf-8') as requirements_file:
