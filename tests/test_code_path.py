@@ -20,10 +20,10 @@ class TestExpandedPathTree(TestCase):
         'check_path_availability',
         new=Mock(),
     )
-    def test_path_generator(self, mocked_path_generator_getter: Mock):
-        """Проверка path_generator."""
+    def test_path_gen(self, mocked_path_gen_getter: Mock):
+        """Проверка path_gen."""
         mock_getter_iter = Mock(return_value=iter([]))
-        mocked_path_generator_getter.return_value = Mock(
+        mocked_path_gen_getter.return_value = Mock(
             __iter__=mock_getter_iter
         )
 
@@ -31,7 +31,7 @@ class TestExpandedPathTree(TestCase):
         mock_target = Mock()
         mock_iter = Mock(return_value=iter([mock_target]))
         tree.targets = Mock(__iter__=mock_iter)
-        list(tree.path_generator)
+        list(tree.path_gen())
 
         self.assertEqual(True, mock_iter.called)
         self.assertEqual(1, mock_iter.call_count)
@@ -39,9 +39,9 @@ class TestExpandedPathTree(TestCase):
         self.assertTupleEqual((), args)
         self.assertDictEqual({}, kwargs)
 
-        self.assertEqual(True, mocked_path_generator_getter.called)
-        self.assertEqual(1, mocked_path_generator_getter.call_count)
-        args, kwargs = mocked_path_generator_getter.call_args
+        self.assertEqual(True, mocked_path_gen_getter.called)
+        self.assertEqual(1, mocked_path_gen_getter.call_count)
+        args, kwargs = mocked_path_gen_getter.call_args
         self.assertTupleEqual((mock_target,), args)
         self.assertDictEqual({}, kwargs)
 

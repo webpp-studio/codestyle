@@ -8,7 +8,6 @@ from typing import Optional
 
 from codestyle import FIRST_ELEMENT_INDEX
 
-
 _logger = getLogger(__name__)
 
 

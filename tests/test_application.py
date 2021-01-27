@@ -18,17 +18,11 @@ class TestConsoleApplication(TestCase):
     @patch('codestyle.application.MESSAGES', new_callable=Mock)
     @patch('codestyle.application.ExpandedPathTree', new_callable=Mock)
     @patch.object(
-        ConsoleApplication,
-        '_ConsoleApplication__create_tools',
-        new_callable=Mock,
-    )
-    @patch.object(
         ConsoleApplication, 'get_file_suffix_tools', new_callable=Mock
     )
     def test_init_with_fix__method(
         self,
         mocked_file_suffix_tools_getter: Mock,
-        mocked_create_tools: Mock,
         mocked_tree: Mock,
         mocked_messages: Mock,
         mocked_logger: Mock,
@@ -51,13 +45,6 @@ class TestConsoleApplication(TestCase):
         self.assertEqual(True, mocked_file_suffix_tools_getter.called)
         self.assertEqual(1, mocked_file_suffix_tools_getter.call_count)
         args, kwargs = mocked_file_suffix_tools_getter.call_args
-        self.assertTupleEqual((mocked_create_tools.return_value,), args)
-        self.assertDictEqual({}, kwargs)
-
-        self.assertEqual(True, mocked_create_tools.called)
-        self.assertEqual(1, mocked_create_tools.call_count)
-        args, kwargs = mocked_create_tools.call_args
-        self.assertTupleEqual((), args)
         self.assertDictEqual({}, kwargs)
 
         self.assertEqual(True, mock_debug_logger.called)
@@ -88,9 +75,6 @@ class TestConsoleApplication(TestCase):
     @patch.object(ConsoleApplication, 'logger', new=Mock(autospec=True))
     @patch('codestyle.application.MESSAGES', new_callable=Mock)
     @patch('codestyle.application.ExpandedPathTree', new=Mock(autospec=True))
-    @patch.object(
-        ConsoleApplication, '_ConsoleApplication__create_tools', new=Mock
-    )
     @patch.object(ConsoleApplication, 'get_file_suffix_tools', new=Mock)
     def test_init_with_check_method(self, mocked_messages: Mock):
         """Проверка инициализации с check методом."""
@@ -120,12 +104,11 @@ class TestConsoleApplication(TestCase):
     @patch('codestyle.application.getattr', new_callable=Mock)
     @patch('codestyle.application.ExpandedPathTree', new_callable=Mock)
     @patch.object(ConsoleApplication, 'logger', new_callable=Mock)
+    @patch.object(ConsoleApplication, 'get_tool', new_callable=Mock)
     @patch.object(ConsoleApplication, 'get_file_suffix_tools', new=Mock)
-    @patch.object(
-        ConsoleApplication, '_ConsoleApplication__create_tools', new=Mock
-    )
     def test_process_files_with_unsuccessful(
         self,
+        mocked_tool: Mock,
         mocked_logger: Mock,
         mocked_tree: Mock,
         mocked_getattr: Mock,
@@ -139,12 +122,14 @@ class TestConsoleApplication(TestCase):
         test_path = Path('test.py')
         mock_iter = Mock(return_value=(path for path in [test_path]))
         mocked_tree.return_value = Mock(
-            path_generator=Mock(__iter__=mock_iter)
+            path_gen=Mock(
+                return_value=Mock(__iter__=mock_iter))
         )
 
         mocked_process_file.return_value = Mock(is_success=False)
 
         mock_tool = Mock(autospec=True)
+        mocked_tool.return_value = mock_tool
         mock_get = Mock(return_value=[mock_tool])
         application = ConsoleApplication(
             Mock(fix=False, target=(), exclude=())
@@ -210,10 +195,8 @@ class TestConsoleApplication(TestCase):
         new=Mock(return_value={'.py': [Mock(autospec=True)]}),
     )
     @patch('codestyle.application.ExpandedPathTree', new_callable=Mock)
-    @patch.object(
-        ConsoleApplication, '_ConsoleApplication__create_tools', new=Mock
-    )
     @patch.object(ConsoleApplication, 'logger', new=Mock(autospec=True))
+    @patch.object(ConsoleApplication, 'get_tool', new=Mock)
     def test_process_files_with_success(
         self,
         mocked_tree: Mock,
@@ -221,13 +204,14 @@ class TestConsoleApplication(TestCase):
     ):
         """Проверка process_files с успешным сценарием проверки."""
         mocked_tree.return_value = Mock(
-            path_generator=Mock(
-                __iter__=Mock(
-                    return_value=(path for path in [Path('test.py')])
+            path_gen=Mock(
+                return_value=Mock(
+                    __iter__=Mock(
+                        return_value=(path for path in [Path('test.py')])
+                    )
                 )
             )
         )
-
         ConsoleApplication(
             Mock(fix=False, target=(), exclude=())
         ).process_files()
@@ -249,9 +233,6 @@ class TestConsoleApplication(TestCase):
     @patch('codestyle.application.ExpandedPathTree', new=Mock())
     @patch('codestyle.application.getLogger', new=Mock())
     @patch.object(ConsoleApplication, 'get_file_suffix_tools', new=Mock())
-    @patch.object(
-        ConsoleApplication, '_ConsoleApplication__create_tools', new=Mock()
-    )
     def test_tool_can_process(self):
         """Проверки __tool_can_process метода в разных вариациях."""
         application = ConsoleApplication(
@@ -274,36 +255,3 @@ class TestConsoleApplication(TestCase):
             Mock(for_check=True)
         )
         self.assertEqual(True, true_result)
-
-    @patch('codestyle.application.ExpandedPathTree', new=Mock())
-    @patch('codestyle.application.getLogger', new=Mock())
-    @patch.object(ConsoleApplication, 'get_file_suffix_tools', new=Mock())
-    @patch.object(
-        ConsoleApplication, '_ConsoleApplication__create_tools', new=Mock()
-    )
-    def test_get_tool_configuration_path(self):
-        """Проверки __get_tool_configuration_path."""
-        mock_get_name = Mock(return_value='tool')
-        mock_wrapper = Mock(get_name=mock_get_name)
-        mock_path = Path('/mock-settings/')
-
-        application = ConsoleApplication(
-            Mock(
-                autospec=True,
-                fix=False,
-                target=iter([]),
-                tool_configuration=Path('settings.json'),
-            )
-        )
-        result = application._ConsoleApplication__get_tool_configuration_path(
-            mock_wrapper, mock_path
-        )
-
-        self.assertIsInstance(result, Path)
-        self.assertEqual(Path('/mock-settings/settings.json'), result)
-
-        self.assertEqual(True, mock_get_name.called)
-        self.assertEqual(1, mock_get_name.call_count)
-        args, kwargs = mock_get_name.call_args
-        self.assertTupleEqual((), args)
-        self.assertDictEqual({}, kwargs)
