@@ -240,18 +240,11 @@ class TestConsoleApplication(TestCase):
         )
 
         false_result = application._ConsoleApplication__tool_can_process(
-            Mock(for_check=False)
+            Mock(for_check=False, optional_flag='')
         )
         self.assertEqual(False, false_result)
 
-        false_result_without_error = (
-            application._ConsoleApplication__tool_can_process(
-                Mock(spec_set=True)
-            )
-        )
-        self.assertEqual(False, false_result_without_error)
-
         true_result = application._ConsoleApplication__tool_can_process(
-            Mock(for_check=True)
+            Mock(for_check=True, optional_flag='')
         )
         self.assertEqual(True, true_result)

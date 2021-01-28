@@ -94,9 +94,10 @@ class ConsoleApplication:
     def __tool_can_process(self, tool: ConsoleTool) -> bool:
         """Проверка возможностей указанного инструмента."""
         can_process = getattr(tool, f'for_{self.__process_method}', False)
-        is_optional = can_process and tool.optional_flag
+        if getattr(self.__parameters_storage, tool.optional_flag, False):
+            return can_process
 
-        return can_process or is_optional
+        return can_process and not tool.optional
 
     def __process_file(self, file_path: Path,
                        process_method: Callable) -> Result:
