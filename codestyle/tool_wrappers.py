@@ -85,6 +85,7 @@ class ConsoleTool:
 
     # Флаг для выбора дополнительной проверки кода.
     optional_flag: str = ''
+    optional = False
 
     def __init__(self, configuration_path: Path = None):
         """
@@ -211,6 +212,7 @@ class ShellCheck(ConsoleTool):
 
     .. seealso:: https://github.com/koalaman/shellcheck
     """
+
     configuration_argument = None
     supported_file_suffixes = ('.sh',)
     for_check = True
