@@ -205,6 +205,17 @@ class Black(ConsoleTool):
     optional_flag = 'black'
 
 
+class ShellCheck(ConsoleTool):
+    """
+    ShellCheck утилита для проверки .sh файлов.
+
+    .. seealso:: https://github.com/koalaman/shellcheck
+    """
+    configuration_argument = None
+    supported_file_suffixes = ('.sh',)
+    for_check = True
+
+
 class ESLint(ConsoleTool):
     """
     Ищет и исправляет проблемы в JavaScript коде.

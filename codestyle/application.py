@@ -11,7 +11,7 @@ from codestyle.system_wrappers import ExitCodes, interrupt_program_flow
 from codestyle.tool_wrappers import (Autoflake, Autopep8, ConsoleTool, ESLint,
                                      Flake8, HTMLCS, PHPCBF, PHPCS, Result,
                                      TOOL_SETTINGS_PATH, Stylelint,
-                                     MyPy, Black)
+                                     MyPy, Black, ShellCheck)
 
 FIX_SUCCESS = 'Твой код просто огонь!💥 Мне не пришлось ничего исправлять.'
 FIX_UNSUCCESSFUL = ('Проверено файлов - {total_count}, из них было '
@@ -26,7 +26,7 @@ MESSAGES = {'fix': {ExitCodes.SUCCESS: FIX_SUCCESS,
             'check': {ExitCodes.SUCCESS: CHECK_SUCCESS,
                       ExitCodes.UNSUCCESSFUL: CHECK_UNSUCCESSFUL}}
 ENABLED_TOOLS = (Flake8, Autopep8, Autoflake, ESLint, PHPCS, PHPCBF, HTMLCS,
-                 Stylelint, MyPy, Black)
+                 Stylelint, MyPy, Black, ShellCheck)
 
 
 # TODO еще надо глянуть почему долго запускается, найти проблемные места
