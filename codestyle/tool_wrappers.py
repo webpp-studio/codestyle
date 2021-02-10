@@ -210,10 +210,13 @@ class ShellCheck(ConsoleTool):
     """
     ShellCheck утилита для проверки .sh файлов.
 
+    Файл .shellcheckrc перемещается в root директорию контейнера
     .. seealso:: https://github.com/koalaman/shellcheck
     """
 
-    configuration_argument = None
+    configuration_argument = ''
+    configuration_file_name = '.shellcheckrc'
+    configuration_path = TOOL_SETTINGS_PATH / configuration_file_name
     supported_file_suffixes = ('.sh',)
     for_check = True
 

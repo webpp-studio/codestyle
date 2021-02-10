@@ -9,5 +9,6 @@ COPY . /tmp/app
 RUN cd /tmp/app \
     && cat npm-deps.txt | xargs npm -g install \
     && ./setup.py install \
+    && cp /tmp/app/codestyle/tool_settings/.shellcheckrc /root \
     && rm -r /tmp/*
 ENTRYPOINT ["python3", "-m", "codestyle"]
