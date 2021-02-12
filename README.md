@@ -25,6 +25,7 @@
 `--file_suffix <file_suffix>` | Проверяемое расширение файлов (.py, .js и так далее; по-умолчанию: все расширения)
 `-m, --mypy` |  Опциональная проверка типизации при помощи mypy
 `-b, --black` | Опциоанльное форматирование при помощи black, только после флага -f
+`-hl, --hadolint` |  Опциональная проверка Dockerfile`ов, в файле .hadolint.yaml указать: ignored: - <номер ошибки>
 `-x <globbing шаблон>, --exclude <globbing шаблон>` | Исключить по указанному globbing шаблону, для файла необходимо указывать список exclude = [file1, file2, ...]
 `--phpcs-encoding PHPCS_ENCODING` | Кодировка для PHP_CodeSniffer (по-умолчанию: utf-8)
 `--stylelint-configuration_name STYLELINT_CONFIGURATION` | Имя файла конфигурации для stylelint утилиты (по-умолчанию: .stylelintsrc.json)

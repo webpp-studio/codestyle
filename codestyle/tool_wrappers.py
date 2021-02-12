@@ -221,6 +221,21 @@ class ShellCheck(ConsoleTool):
     for_check = True
 
 
+class Hadolint(ConsoleTool):
+    """
+    Hadolint утилита для проверки Dockerfile.
+
+    Файл .hadolint.yaml перемещается в app директорию контейнера
+    .. seealso:: https://github.com/hadolint/hadolint
+    """
+
+    configuration_argument = ''
+    supported_file_suffixes = ('',)
+    for_check = True
+    optional = True
+    optional_flag = 'hadolint'
+
+
 class ESLint(ConsoleTool):
     """
     Ищет и исправляет проблемы в JavaScript коде.
