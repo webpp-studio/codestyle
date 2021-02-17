@@ -12,7 +12,7 @@ test image:
   image: gcr.io/kaniko-project/executor:debug
   script:
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --cache=true --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/tests/Dockerfile --destination $CI_REGISTRY_IMAGE/test:$CI_COMMIT_REF_SLUG
+    - /kaniko/executor --cache=true --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/tests/Dockerfile --destination $CI_REGISTRY_IMAGE/test:$CI_PIPELINE_ID
   only:
     - branches
   except:
@@ -20,7 +20,7 @@ test image:
 
 units:
   stage: test
-  image: $CI_REGISTRY_IMAGE/test:$CI_COMMIT_REF_SLUG
+  image: $CI_REGISTRY_IMAGE/test:$CI_PIPELINE_ID
   script: python -m tox
   only:
     - branches
