@@ -12,7 +12,8 @@ RUN pyenv install 3.6.12 && pyenv install 3.7.9 && pyenv install 3.8.6 && pyenv 
     && pyenv global 3.6.12 3.7.9 3.8.6 3.9.0  \
     && python3 -m pip --no-cache-dir install --upgrade pip \
     && python3 -m pip --no-cache-dir install tox==3.20.0 PyYAML==5.3.1 \
-    && pear install --soft --onlyreqdeps PHP_CodeSniffer-3.5.6
+    && pear install --soft --onlyreqdeps PHP_CodeSniffer-3.5.6 \
+    && apk add shellcheck
 COPY . .
 RUN npm install \
     && rm -r /tmp/*

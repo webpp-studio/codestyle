@@ -6,10 +6,10 @@
 from os import linesep
 from pathlib import Path
 from subprocess import PIPE, run  # noqa: S404
+from typing import Sequence, Optional
 
 from codestyle import APPLICATION_PATH
 from codestyle.system_wrappers import ExitCodes, check_output
-
 
 TOOL_SETTINGS_PATH = APPLICATION_PATH / 'tool_settings'
 
@@ -52,19 +52,19 @@ class ConsoleTool:
     configuration_argument: str = '--config'
 
     # Название конфигурационного файла.
-    configuration_file_name: str = None
+    configuration_file_name: str = ''
 
     # Путь до директории, в которой располагается файл конфигурации.
-    configuration_path: Path = None
+    configuration_path: Optional[Path] = None
 
     # Дополнительные аргументы командной строки, необходимые для запуска
-    # утилиты. Пример: ('--length', '79', '--skip-string-normalization')
-    extra_run_arguments: list = []
+    # утилиты. Пример: ('--length', '79', '--skip-string-normalization')  # noqa: E800, E501
+    extra_run_arguments: Sequence = ()
 
     # Название инструмента, которое будет использовано для его запуска
     # в командной строке; по-умолчанию - название класса в нижнем
     # начертании.
-    cli_tool_name: str = None
+    cli_tool_name: str = ''
 
     # Суфиксы файлов (с точкой в начале), которые поддерживаются утилитой.
     supported_file_suffixes: tuple
@@ -84,8 +84,8 @@ class ConsoleTool:
     for_fix: bool = False
 
     # Флаг для выбора дополнительной проверки кода.
-    optional: bool = False
-    optional_flag: str = None
+    optional_flag: str = ''
+    optional = False
 
     def __init__(self, configuration_path: Path = None):
         """
@@ -111,9 +111,9 @@ class ConsoleTool:
         """Исправление файла по указанному пути."""
         return self._process_file(file_path, self.fix_arguments)
 
-    def _get_extra_run_arguments(self) -> list:
+    def _get_extra_run_arguments(self) -> Sequence:
         """Дополнительные аргументы запуска приложения."""
-        return self.extra_run_arguments if self.extra_run_arguments else []
+        return self.extra_run_arguments if self.extra_run_arguments else ()
 
     def _process_file(self, file_path: Path, run_arguments: tuple) -> Result:
         """
@@ -157,7 +157,7 @@ class Autopep8(ConsoleTool):
     .. seealso:: https://github.com/hhatto/autopep8
     """
 
-    configuration_argument = None
+    configuration_argument = ''
     extra_run_arguments = ('--in-place', '--aggressive')
     supported_file_suffixes = ('.py',)
     for_fix = True
@@ -170,7 +170,7 @@ class Autoflake(ConsoleTool):
     .. seealso:: https://github.com/myint/autoflake
     """
 
-    configuration_argument = None
+    configuration_argument = ''
     extra_run_arguments = ('--in-place', '--remove-unused-variables')
     supported_file_suffixes = ('.py',)
     for_fix = True
@@ -182,6 +182,7 @@ class MyPy(ConsoleTool):
 
     .. seealso:: https://github.com/python/mypy
     """
+
     configuration_file_name = 'mypy.conf'
     configuration_path = TOOL_SETTINGS_PATH / configuration_file_name
     supported_file_suffixes = ('.py',)
@@ -196,12 +197,43 @@ class Black(ConsoleTool):
 
     .. seealso:: https://black.readthedocs.io/en/stable/
     """
+
     configuration_file_name = 'black.cfg'
     configuration_path = TOOL_SETTINGS_PATH / configuration_file_name
     supported_file_suffixes = ('.py',)
     for_fix = True
     optional = True
     optional_flag = 'black'
+
+
+class ShellCheck(ConsoleTool):
+    """
+    ShellCheck утилита для проверки .sh файлов.
+
+    Файл .shellcheckrc перемещается в root директорию контейнера
+    .. seealso:: https://github.com/koalaman/shellcheck
+    """
+
+    configuration_argument = ''
+    configuration_file_name = '.shellcheckrc'
+    configuration_path = TOOL_SETTINGS_PATH / configuration_file_name
+    supported_file_suffixes = ('.sh',)
+    for_check = True
+
+
+class Hadolint(ConsoleTool):
+    """
+    Hadolint утилита для проверки Dockerfile.
+
+    Файл .hadolint.yaml перемещается в app директорию контейнера
+    .. seealso:: https://github.com/hadolint/hadolint
+    """
+
+    configuration_argument = ''
+    supported_file_suffixes = ('',)
+    for_check = True
+    optional = True
+    optional_flag = 'hadolint'
 
 
 class ESLint(ConsoleTool):
@@ -211,7 +243,7 @@ class ESLint(ConsoleTool):
     .. seealso:: https://eslint.org
     """
 
-    NPM_ROOT: str = check_output(('npm', 'root'))
+    NPM_ROOT: Optional[str] = check_output(('npm', 'root'))
     NPM_ROOT_PATH: str = str(Path(NPM_ROOT).resolve())
 
     supported_file_suffixes = ('.js', '.vue')
@@ -233,7 +265,7 @@ class _PHPCodeSniffer(ConsoleTool):
     .. seealso:: https://github.com/squizlabs/PHP_CodeSniffer
     """
 
-    configuration_argument = None
+    configuration_argument = ''
     configuration_file_name = 'phpcs.xml'
     configuration_path = TOOL_SETTINGS_PATH / configuration_file_name
     encoding = 'utf-8'

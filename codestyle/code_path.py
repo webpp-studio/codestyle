@@ -21,10 +21,10 @@ class ExpandedPathTree:
         self.targets = set(targets)
         self.excludes = set(excludes)
 
-    @property
-    def path_generator(self) -> Generator[Path, None, None]:
+    def path_gen(self, targets=None) -> Generator[Path, None, None]:
         """Генератор развёрнутых путей."""
-        for path in self.targets:
+        targets = targets if targets else self.targets
+        for path in targets:
             yield from self.__generate_paths(path)
 
     @staticmethod
@@ -59,5 +59,4 @@ class ExpandedPathTree:
         if path.is_file():
             yield path
         elif path.is_dir():
-            for directory_child in path.iterdir():
-                yield from self.__generate_paths(directory_child)
+            yield from self.path_gen(path.iterdir())
