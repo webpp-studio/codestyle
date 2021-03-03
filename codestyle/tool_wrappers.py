@@ -243,7 +243,7 @@ class ESLint(ConsoleTool):
     .. seealso:: https://eslint.org
     """
 
-    NPM_ROOT: Optional[str] = check_output(('npm', 'root'))
+    NPM_ROOT: Optional[str] = check_output(('npm', 'root', '-g'))
     NPM_ROOT_PATH: str = str(Path(NPM_ROOT).resolve())
 
     supported_file_suffixes = ('.js', '.vue')
