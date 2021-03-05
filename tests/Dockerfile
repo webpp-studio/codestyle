@@ -3,7 +3,7 @@ WORKDIR /app
 RUN apk add --no-cache \
         bzip2-dev coreutils dpkg-dev dpkg expat-dev findutils gcc gdbm-dev libc-dev libffi-dev libnsl-dev libtirpc-dev \
         linux-headers make ncurses-dev openssl-dev pax-utils readline-dev sqlite-dev tcl-dev tk tk-dev util-linux-dev \
-        xz-dev zlib-dev yaml-dev git curl bash npm=12.20.1-r0 \
+        xz-dev zlib-dev yaml-dev git curl bash npm \
     && curl https://pyenv.run | bash
 ENV HOME /root
 ENV PYENV_ROOT $HOME/.pyenv
