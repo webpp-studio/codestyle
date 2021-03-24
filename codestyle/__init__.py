@@ -24,7 +24,7 @@ def _read_first_line_documentation(documentation: str) -> str:
     return list(empty_lines_filter)[FIRST_LINE_INDEX]
 
 
-__version__ = '3.0.0'
+__version__ = '3.1.3'
 __description__ = _read_first_line_documentation(__doc__)
 __author__ = 'Сергей Левитин и Web++ студия'
 __author_email__ = 'tech@webpp.ru'

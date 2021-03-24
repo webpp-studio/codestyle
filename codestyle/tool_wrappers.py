@@ -6,10 +6,10 @@
 from os import linesep
 from pathlib import Path
 from subprocess import PIPE, run  # noqa: S404
+from typing import Sequence, Optional
 
 from codestyle import APPLICATION_PATH
 from codestyle.system_wrappers import ExitCodes, check_output
-
 
 TOOL_SETTINGS_PATH = APPLICATION_PATH / 'tool_settings'
 
@@ -52,19 +52,19 @@ class ConsoleTool:
     configuration_argument: str = '--config'
 
     # Название конфигурационного файла.
-    configuration_file_name: str = None
+    configuration_file_name: str = ''
 
     # Путь до директории, в которой располагается файл конфигурации.
-    configuration_path: Path = None
+    configuration_path: Optional[Path] = None
 
     # Дополнительные аргументы командной строки, необходимые для запуска
-    # утилиты. Пример: ('--length', '79', '--skip-string-normalization')
-    extra_run_arguments: list = []
+    # утилиты. Пример: ('--length', '79', '--skip-string-normalization')  # noqa: E800, E501
+    extra_run_arguments: Sequence = ()
 
     # Название инструмента, которое будет использовано для его запуска
     # в командной строке; по-умолчанию - название класса в нижнем
     # начертании.
-    cli_tool_name: str = None
+    cli_tool_name: str = ''
 
     # Суфиксы файлов (с точкой в начале), которые поддерживаются утилитой.
     supported_file_suffixes: tuple
@@ -82,6 +82,10 @@ class ConsoleTool:
     # for_fix - для исправления/форматирования файлов.
     for_check: bool = False
     for_fix: bool = False
+
+    # Флаг для выбора дополнительной проверки кода.
+    optional_flag: str = ''
+    optional = False
 
     def __init__(self, configuration_path: Path = None):
         """
@@ -107,9 +111,9 @@ class ConsoleTool:
         """Исправление файла по указанному пути."""
         return self._process_file(file_path, self.fix_arguments)
 
-    def _get_extra_run_arguments(self) -> list:
+    def _get_extra_run_arguments(self) -> Sequence:
         """Дополнительные аргументы запуска приложения."""
-        return self.extra_run_arguments if self.extra_run_arguments else []
+        return self.extra_run_arguments if self.extra_run_arguments else ()
 
     def _process_file(self, file_path: Path, run_arguments: tuple) -> Result:
         """
@@ -137,7 +141,7 @@ class Flake8(ConsoleTool):
     """
     flake8 утилита для проверки python кода.
 
-    https://gitlab.com/pycqa/flake8.
+    .. seealso:: https://gitlab.com/pycqa/flake8
     """
 
     configuration_file_name = 'flake8.conf'
@@ -150,10 +154,10 @@ class Autopep8(ConsoleTool):
     """
     autopep8 утилита для форматирования python кода.
 
-    https://github.com/hhatto/autopep8.
+    .. seealso:: https://github.com/hhatto/autopep8
     """
 
-    configuration_argument = None
+    configuration_argument = ''
     extra_run_arguments = ('--in-place', '--aggressive')
     supported_file_suffixes = ('.py',)
     for_fix = True
@@ -163,23 +167,83 @@ class Autoflake(ConsoleTool):
     """
     autoflake утилита для удаления неиспользуемых импортов в python.
 
-    https://github.com/myint/autoflake.
+    .. seealso:: https://github.com/myint/autoflake
     """
 
-    configuration_argument = None
+    configuration_argument = ''
     extra_run_arguments = ('--in-place', '--remove-unused-variables')
     supported_file_suffixes = ('.py',)
     for_fix = True
+
+
+class MyPy(ConsoleTool):
+    """
+    Mypy утилита для проверки типов в python коде.
+
+    .. seealso:: https://github.com/python/mypy
+    """
+
+    configuration_file_name = 'mypy.conf'
+    configuration_path = TOOL_SETTINGS_PATH / configuration_file_name
+    supported_file_suffixes = ('.py',)
+    for_check = True
+    optional = True
+    optional_flag = 'mypy'
+
+
+class Black(ConsoleTool):
+    """
+    Black утилита для форматирования python кода.
+
+    .. seealso:: https://black.readthedocs.io/en/stable/
+    """
+
+    configuration_file_name = 'black.cfg'
+    configuration_path = TOOL_SETTINGS_PATH / configuration_file_name
+    supported_file_suffixes = ('.py',)
+    for_fix = True
+    optional = True
+    optional_flag = 'black'
+
+
+class ShellCheck(ConsoleTool):
+    """
+    ShellCheck утилита для проверки .sh файлов.
+
+    Файл .shellcheckrc перемещается в root директорию контейнера
+    .. seealso:: https://github.com/koalaman/shellcheck
+    """
+
+    configuration_argument = ''
+    configuration_file_name = '.shellcheckrc'
+    configuration_path = TOOL_SETTINGS_PATH / configuration_file_name
+    supported_file_suffixes = ('.sh',)
+    for_check = True
+
+
+class Hadolint(ConsoleTool):
+    """
+    Hadolint утилита для проверки Dockerfile.
+
+    Файл .hadolint.yaml перемещается в app директорию контейнера
+    .. seealso:: https://github.com/hadolint/hadolint
+    """
+
+    configuration_argument = ''
+    supported_file_suffixes = ('',)
+    for_check = True
+    optional = True
+    optional_flag = 'hadolint'
 
 
 class ESLint(ConsoleTool):
     """
     Ищет и исправляет проблемы в JavaScript коде.
 
-    https://eslint.org.
+    .. seealso:: https://eslint.org
     """
 
-    NPM_ROOT: str = check_output(('npm', 'root'))
+    NPM_ROOT: Optional[str] = check_output(('npm', 'root', '-g'))
     NPM_ROOT_PATH: str = str(Path(NPM_ROOT).resolve())
 
     supported_file_suffixes = ('.js', '.vue')
@@ -198,14 +262,15 @@ class _PHPCodeSniffer(ConsoleTool):
     Используется для создания (наследованием) phpcs (проверка файлов) и
     phpcbf (проверка и исправление файлов) утилит.
 
-    https://github.com/squizlabs/PHP_CodeSniffer.
+    .. seealso:: https://github.com/squizlabs/PHP_CodeSniffer
     """
 
-    configuration_argument = '--standard='
+    configuration_argument = ''
     configuration_file_name = 'phpcs.xml'
     configuration_path = TOOL_SETTINGS_PATH / configuration_file_name
     encoding = 'utf-8'
-    extra_run_arguments = ['--runtime-set', 'ignore_warnings_on_exit', 'true']
+    extra_run_arguments = [f'--standard={configuration_path}',
+                           '--runtime-set', 'ignore_warnings_on_exit', 'true']
     supported_file_suffixes = ('.inc', '.php', '.js', '.css')
 
     def __init__(self, encoding: str = encoding, **kwargs):
@@ -232,7 +297,7 @@ class HTMLCS(ConsoleTool):
     """
     Инструмент проверки и форматирования html файлов.
 
-    https://github.com/ecomfe/htmlcs.
+    .. seealso:: https://github.com/ecomfe/htmlcs
     """
 
     configuration_file_name = 'htmlcs.json'
@@ -247,7 +312,7 @@ class Stylelint(ConsoleTool):
     """
     Инструмент проверки и форматирования css-подобных языков.
 
-    https://stylelint.io.
+    .. seealso:: https://stylelint.io
     """
 
     configuration_file_name = '.stylelintsrc.json'

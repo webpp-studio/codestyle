@@ -1,14 +1,17 @@
 """Модуль с приложением."""
+from collections import defaultdict
+from functools import lru_cache
 from logging import ERROR, INFO, Logger, getLogger
 from pathlib import Path
-from typing import Callable, Dict, List
+from typing import Callable, Dict, List, Type
 
 from codestyle.code_path import ExpandedPathTree
 from codestyle.parameters_parse import ParametersStorage
 from codestyle.system_wrappers import ExitCodes, interrupt_program_flow
 from codestyle.tool_wrappers import (Autoflake, Autopep8, ConsoleTool, ESLint,
                                      Flake8, HTMLCS, PHPCBF, PHPCS, Result,
-                                     TOOL_SETTINGS_PATH, Stylelint)
+                                     TOOL_SETTINGS_PATH, Stylelint,
+                                     MyPy, Black, ShellCheck, Hadolint)
 
 FIX_SUCCESS = 'Твой код просто огонь!💥 Мне не пришлось ничего исправлять.'
 FIX_UNSUCCESSFUL = ('Проверено файлов - {total_count}, из них было '
@@ -23,9 +26,10 @@ MESSAGES = {'fix': {ExitCodes.SUCCESS: FIX_SUCCESS,
             'check': {ExitCodes.SUCCESS: CHECK_SUCCESS,
                       ExitCodes.UNSUCCESSFUL: CHECK_UNSUCCESSFUL}}
 ENABLED_TOOLS = (Flake8, Autopep8, Autoflake, ESLint, PHPCS, PHPCBF, HTMLCS,
-                 Stylelint)
+                 Stylelint, MyPy, Black, ShellCheck, Hadolint)
 
 
+# TODO еще надо глянуть почему долго запускается, найти проблемные места
 class ConsoleApplication:
     """Консольное приложение."""
 
@@ -41,17 +45,26 @@ class ConsoleApplication:
         self.__parameters_storage = parameters_storage
         method = 'fix' if self.__parameters_storage.fix else 'check'
         self.__process_method = method
-        tools = self.__create_tools()
-        self.__file_suffix_tools = self.get_file_suffix_tools(tools)
+        self.__file_suffix_tools = self.get_file_suffix_tools()
 
         self.logger.debug('Разворачивание дерева файлов и директорий...')
         path_tree = ExpandedPathTree(
             *self.__parameters_storage.target,
             excludes=self.__parameters_storage.exclude)
-        self.__path_generator = path_tree.path_generator
+        self.__path_gen = path_tree.path_gen()
 
         self.logger.debug('Определение метода обработки файлов...')
         self.__status_messages = MESSAGES[self.__process_method]
+
+    @lru_cache(maxsize=None)
+    def get_tool(self, cls: Type[ConsoleTool]) -> ConsoleTool:
+        """
+        Получить инстанс инструмента.
+
+        :param cls: класс инструмента
+        :return:
+        """
+        return cls(**self.__get_tool_kwargs(cls))
 
     def process_files(self):
         """Обработка файлов."""
@@ -59,8 +72,10 @@ class ConsoleApplication:
 
         total_success = total_failed = 0
         status, log_level = ExitCodes.SUCCESS, INFO
-        for path in self.__path_generator:
-            for tool in self.__file_suffix_tools.get(path.suffix, []):
+
+        for path in self.__path_gen:
+            for tool_cls in self.__file_suffix_tools.get(path.suffix, []):
+                tool = self.get_tool(tool_cls)
                 process_method = getattr(tool, self.__process_method)
                 result = self.__process_file(path, process_method)
                 if result.is_success:
@@ -76,19 +91,13 @@ class ConsoleApplication:
         interrupt_program_flow(status=status, log_message=message,
                                log_level=log_level)
 
-    def __create_tools(self) -> List[ConsoleTool]:
-        """Создание инструментов для обработки файлов."""
-        self.logger.debug(f'{self.__create_tools.__doc__}..')
-        tools = []
-        for tool in ENABLED_TOOLS:
-            tool = tool(**self.__get_tool_kwargs(tool))
-            if self.__tool_can_process(tool):
-                tools.append(tool)
-        return tools
-
     def __tool_can_process(self, tool: ConsoleTool) -> bool:
         """Проверка возможностей указанного инструмента."""
-        return getattr(tool, f'for_{self.__process_method}', False)
+        can_process = getattr(tool, f'for_{self.__process_method}', False)
+        if getattr(self.__parameters_storage, tool.optional_flag, False):
+            return can_process
+
+        return can_process and not tool.optional
 
     def __process_file(self, file_path: Path,
                        process_method: Callable) -> Result:
@@ -107,9 +116,7 @@ class ConsoleApplication:
             self.logger.log(level, result.whole_output)
         return result
 
-    @staticmethod
-    def get_file_suffix_tools(
-            tools: List[ConsoleTool]) -> Dict[str, List[ConsoleTool]]:
+    def get_file_suffix_tools(self) -> Dict[str, List[ConsoleTool]]:
         """
         Создание словаря с расширениями файлов.
 
@@ -117,13 +124,12 @@ class ConsoleApplication:
         :return: словарь с расширениями, каждому из которых
             соответствует свой набор поддерживаемых утилит
         """
-        file_suffix_tools = {}
+        file_suffix_tools = defaultdict(list)
+        tools = filter(self.__tool_can_process, ENABLED_TOOLS)
         for tool in tools:
             for suffix in tool.supported_file_suffixes:
-                if file_suffix_tools.get(suffix):
-                    file_suffix_tools[suffix].append(tool)
-                    continue
-                file_suffix_tools[suffix] = [tool]
+                file_suffix_tools[suffix].append(tool)
+
         return file_suffix_tools
 
     def __get_tool_kwargs(self, tool_wrapper) -> dict:
@@ -136,19 +142,17 @@ class ConsoleApplication:
         tool_kwargs = {'configuration_path': None}
 
         if self.__parameters_storage.settings != TOOL_SETTINGS_PATH:
-            configuration_path = self.__get_tool_configuration_path(
+            configuration_path = self.__get_config_path(
                 tool_wrapper, self.__parameters_storage.settings)
             tool_kwargs.update({'configuration_path': str(configuration_path)})
 
-        tool_name = tool_wrapper.cli_tool_name
-        if tool_name in ('phpcs', 'phpcbf'):
+        if tool_wrapper.cli_tool_name in ('phpcs', 'phpcbf'):
             tool_kwargs.update(
                 {'encoding': self.__parameters_storage.phpcs_encoding})
 
         return tool_kwargs
 
-    def __get_tool_configuration_path(self, tool_wrapper,
-                                      settings_path: Path) -> Path:
+    def __get_config_path(self, tool_wrapper, settings_path: Path) -> Path:
         """
         Определение пути к конфигурации для указанного инструмента.
 
